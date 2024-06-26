@@ -34,6 +34,7 @@ class _SettingsState extends State<Settings> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
+          tooltip: "Back to Vault",
           onPressed: _returnToHomePage,
           icon: const FaIcon(FontAwesomeIcons.arrowLeftLong),
         ),
