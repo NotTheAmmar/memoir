@@ -36,10 +36,9 @@ class AccessibilitySection extends StatelessWidget {
     final File exportFile = await File(
       '$documentsDir/Memoir/backup.bin',
     ).create(recursive: true);
-    // exportFile.openWrite();
     exportFile.writeAsBytes(base64Bytes).then((_) {
       context.messenger.showSnackBar(const SnackBar(
-        content: Text("Exported"),
+        content: Text("Exported Containers to 'Documents/Memoir'"),
       ));
     });
   }
@@ -118,7 +117,7 @@ class AccessibilitySection extends StatelessWidget {
       importNotifier();
 
       context.messenger.showSnackBar(const SnackBar(
-        content: Text("Imported"),
+        content: Text("Imported Containers"),
       ));
     });
   }

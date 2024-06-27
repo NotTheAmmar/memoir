@@ -48,7 +48,7 @@ class AboutSettingSection extends StatelessWidget {
                   fontStyle: FontStyle.italic,
                 ),
               ),
-              const Text("1.1.0"),
+              const Text("1.2.0"),
             ],
           ),
         ),
