@@ -10,6 +10,7 @@ import 'package:memoir/classes/container.dart' as my;
 import 'package:memoir/classes/database.dart';
 import 'package:memoir/dialogs/confirm.dart';
 import 'package:memoir/extensions.dart';
+import 'package:memoir/main.dart';
 
 /// Accessibility Settings
 class AccessibilitySection extends StatelessWidget {
@@ -20,10 +21,24 @@ class AccessibilitySection extends StatelessWidget {
 
   /// Exports Containers in binary file format to documents folder
   ///
+  /// First Checks for storage permissions, if granted then executes
+  ///
   /// After success, shows a [SnackBar] message
   ///
   /// Encodes data in Base64 format
   Future<void> _exportContainers(BuildContext context) async {
+    final bool permissionsGranted = await checkPermissions();
+
+    if (context.mounted && !permissionsGranted) {
+      context.messenger.showSnackBar(const SnackBar(
+        content: Text("Need Storage Permission"),
+        duration: Duration(seconds: 3),
+        showCloseIcon: true,
+      ));
+
+      return;
+    }
+
     final String documentsDir = await AndroidPathProvider.documentsPath;
 
     final List<my.Container> containers = await SQLite.instance.getContainers();
@@ -33,17 +48,22 @@ class AccessibilitySection extends StatelessWidget {
     final String base64Data = base64Encode(dataBytes);
     final List<int> base64Bytes = utf8.encode(base64Data);
 
+    final String date = DateTime.now().toString().substring(0, 10);
     final File exportFile = await File(
-      '$documentsDir/Memoir/backup.bin',
+      '$documentsDir/Memoir/Backup $date.bin',
     ).create(recursive: true);
     exportFile.writeAsBytes(base64Bytes).then((_) {
       context.messenger.showSnackBar(const SnackBar(
-        content: Text("Exported Containers to 'Documents/Memoir'"),
+        content: Text(
+          "Exported Containers to \"Internal Storage/Documents/Memoir\"",
+        ),
       ));
     });
   }
 
   /// Imports Containers from the exported binary file
+  ///
+  /// First Checks for storage permissions, if granted then executes
   ///
   /// Prompts the user to select the binary file, if not selected then aborts the process
   ///
@@ -57,6 +77,18 @@ class AccessibilitySection extends StatelessWidget {
   ///
   /// After successful import, a [SnackBar] message is shown
   Future<void> _importContainers(BuildContext context) async {
+    final bool permissionsGranted = await checkPermissions();
+
+    if (context.mounted && !permissionsGranted) {
+      context.messenger.showSnackBar(const SnackBar(
+        content: Text("Need Storage Permission"),
+        duration: Duration(seconds: 3),
+        showCloseIcon: true,
+      ));
+
+      return;
+    }
+
     final FilePickerResult? pickedFile = await FilePicker.platform.pickFiles(
       allowMultiple: false,
       dialogTitle: "Pick Json File",

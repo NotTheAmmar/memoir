@@ -2,7 +2,7 @@ name: memoir
 description: "My Personal Password Manager"
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
-version: 1.2.0
+version: 1.1.1
 
 environment:
   sdk: ">=3.4.1 <4.0.0"

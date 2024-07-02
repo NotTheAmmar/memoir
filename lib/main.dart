@@ -14,15 +14,22 @@ void main() {
     return ErrorPage(errorDetails: errorDetails);
   };
 
-  SQLite.instance.initDatabase().then((_) {
-    runApp(const App());
+  SQLite.instance.initDatabase().then((_) => runApp(const App()));
+}
 
-    Permission.storage.isGranted.then((value) {
-      if (!value) Permission.storage.request();
-    });
+/// Checks and requests the Storage Permission required for Export and Import of Containers
+///
+/// Returns `false` if permission is not granted or missing
+Future<bool> checkPermissions() async {
+  if (!await Permission.storage.isGranted) {
+    if (!(await Permission.storage.request()).isGranted) return false;
+  }
 
-    Permission.manageExternalStorage.isGranted.then((value) {
-      if (!value) Permission.manageExternalStorage.request();
-    });
-  });
+  if (!await Permission.manageExternalStorage.isGranted) {
+    if (!(await Permission.manageExternalStorage.request()).isGranted) {
+      return false;
+    }
+  }
+
+  return true;
 }
