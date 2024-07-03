@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:memoir/classes/password_generator.dart';
-import 'package:memoir/config.dart';
+import 'package:memoir/classes/user_preferences.dart';
 import 'package:memoir/dialogs/password_preferences.dart';
 
 /// Handles generating random password and preferences for generating random password
@@ -21,27 +21,27 @@ class _PasswordToolsState extends State<PasswordTools> {
   /// Current setting preference of `Using Letters` for generating random password
   ///
   /// Default Value is of Config, essentially the global setting
-  bool _useLetters = Config.instance.useLetters;
+  bool _useLetters = UserPreferences.instance.useLetters;
 
   /// Current setting preference of `Including Uppercase Letters` in randomly generated passwords
   ///
   /// Default Value is of Config, essentially the global setting
-  bool _includeUppercase = Config.instance.includeUppercase;
+  bool _includeUppercase = UserPreferences.instance.includeUppercase;
 
   /// Current setting preference of `Including Number` in randomly generated passwords
   ///
   /// Default Value is of Config, essentially the global setting
-  bool _includeNumbers = Config.instance.includeNumbers;
+  bool _includeNumbers = UserPreferences.instance.includeNumbers;
 
   /// Current setting preference of `Including Special Characters` in randomly generated passwords
   ///
   /// Default Value is of Config, essentially the global setting
-  bool _includeSpecialChars = Config.instance.includeSpecialChars;
+  bool _includeSpecialChars = UserPreferences.instance.includeSpecialChars;
 
   /// Current setting preference of `Password Length` for generating random passwords
   ///
   /// Default Value is of Config, essentially the global setting
-  double _passLen = Config.instance.passwordLen;
+  double _passLen = UserPreferences.instance.passwordLen;
 
   /// Generates a random password and calls the password setter for parent
   void _generateRandomPassword() {

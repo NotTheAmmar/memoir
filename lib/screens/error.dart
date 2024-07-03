@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:memoir/assets.dart';
+import 'package:memoir/classes/assets.dart';
 import 'package:memoir/extensions.dart';
 
 /// Widget to show an Error when an exception occurs

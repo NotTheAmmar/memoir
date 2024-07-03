@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memoir/app/theme.dart';
-import 'package:memoir/config.dart';
+import 'package:memoir/classes/user_preferences.dart';
 import 'package:memoir/screens/home/home.dart';
 import 'package:memoir/screens/settings/settings.dart';
 import 'package:memoir/screens/splash_screen.dart';
@@ -14,13 +14,13 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: Config.instance,
+      animation: UserPreferences.instance,
       builder: (_, __) {
         return MaterialApp(
           title: 'Memoir',
           theme: lightTheme,
           darkTheme: darkTheme,
-          themeMode: Config.instance.themeMode,
+          themeMode: UserPreferences.instance.themeMode,
           initialRoute: '/splashScreen',
           routes: {
             '/splashScreen': (_) => const SplashScreen(),

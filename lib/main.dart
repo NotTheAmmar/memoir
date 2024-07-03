@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:memoir/app/app.dart';
 import 'package:memoir/classes/database.dart';
+import 'package:memoir/classes/local_authenticator.dart';
+import 'package:memoir/classes/user_preferences.dart';
 import 'package:memoir/screens/error.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -14,7 +18,20 @@ void main() {
     return ErrorPage(errorDetails: errorDetails);
   };
 
-  SQLite.instance.initDatabase().then((_) => runApp(const App()));
+  Future.wait([
+    SQLite.instance.initDatabase(),
+    UserPreferences.instance.initializeStorage(),
+    LocalAuthenticator.instance.initialize()
+  ]).then((_) async {
+    if (LocalAuthenticator.instance.canAuthenticate &&
+        UserPreferences.instance.authenticateOnLaunch) {
+      if (!await LocalAuthenticator.instance.authenticate()) {
+        exit(0);
+      }
+    }
+
+    runApp(const App());
+  });
 }
 
 /// Checks and requests the Storage Permission required for Export and Import of Containers

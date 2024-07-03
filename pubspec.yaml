@@ -16,6 +16,7 @@ dependencies:
   file_picker:
   font_awesome_flutter:
   gap:
+  local_auth: 
   path:
   permission_handler: 
   random_password_generator:

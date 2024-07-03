@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
-import 'package:memoir/assets.dart';
+import 'package:memoir/classes/assets.dart';
 import 'package:memoir/classes/container.dart' as my;
 import 'package:memoir/extensions.dart';
 import 'package:memoir/sheets/container.dart';

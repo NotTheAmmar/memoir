@@ -45,7 +45,7 @@ class _SettingsState extends State<Settings> {
           padding: const EdgeInsets.all(10),
           child: Column(
             children: [
-              const GeneralSettingsSection(),
+              GeneralSettingsSection(),
               const Gap(20),
               const PasswordSettingsSection(),
               const Gap(20),

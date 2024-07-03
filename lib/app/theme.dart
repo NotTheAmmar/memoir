@@ -9,6 +9,10 @@ const EdgeInsets _padding = EdgeInsets.all(10);
 /// Default Splash Factory
 const InteractiveInkFeatureFactory _splashFactory = InkRipple.splashFactory;
 
+/// Default Shape Border
+final ShapeBorder _border =
+    RoundedRectangleBorder(borderRadius: BorderRadius.circular(10));
+
 /// Base Color for Theme
 const Color _mainColor = Color(0xFFFFCE54);
 
@@ -27,14 +31,20 @@ final ColorScheme _darkScheme = ColorScheme.fromSeed(
   onError: Colors.redAccent,
 );
 
-/// Common Theme for Both [lightTheme] and [dakTheme]
+/// Common Theme for Both [lightTheme] and [darkTheme]
 final CardTheme _cardTheme = CardTheme(
   elevation: 10,
   margin: const EdgeInsets.all(5),
-  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+  shape: _border,
 );
 
-/// Common Theme for Both [lightTheme] and [dakTheme]
+/// Common Theme for Both [lightTheme] and [darkTheme]
+const ExpansionTileThemeData _expansionTileTheme = ExpansionTileThemeData(
+  childrenPadding: _padding,
+  tilePadding: _padding,
+);
+
+/// Common Theme for Both [lightTheme] and [darkTheme]
 const FilledButtonThemeData _filledBtnTheme = FilledButtonThemeData(
   style: ButtonStyle(
     elevation: WidgetStatePropertyAll(10),
@@ -64,7 +74,7 @@ final PopupMenuThemeData _popupMenuTheme = PopupMenuThemeData(
   elevation: 10,
   enableFeedback: true,
   position: PopupMenuPosition.under,
-  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+  shape: _border,
 );
 
 /// Common Theme for Both [lightTheme] and [darkTheme]
@@ -155,7 +165,7 @@ final ThemeData lightTheme = ThemeData(
     contentTextStyle: _lightTextTheme.bodyMedium,
     elevation: 10,
     insetPadding: _padding,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    shape: _border,
     titleTextStyle: _lightTextTheme.titleMedium,
   ),
   dividerTheme: DividerThemeData(
@@ -173,6 +183,7 @@ final ThemeData lightTheme = ThemeData(
     ),
     textStyle: _lightTextTheme.bodyMedium,
   ),
+  expansionTileTheme: _expansionTileTheme,
   iconButtonTheme: _iconBtnTheme,
   inputDecorationTheme: InputDecorationTheme(
     border: UnderlineInputBorder(borderRadius: BorderRadius.circular(10)),
@@ -199,7 +210,7 @@ final ThemeData lightTheme = ThemeData(
     dismissDirection: DismissDirection.down,
     elevation: 10,
     insetPadding: _padding,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    shape: _border,
     showCloseIcon: true,
   ),
   textButtonTheme: _textBtnTheme,
@@ -216,7 +227,7 @@ final ThemeData darkTheme = ThemeData(
     contentTextStyle: _darkTextTheme.bodyMedium,
     elevation: 10,
     insetPadding: _padding,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    shape: _border,
     titleTextStyle: _darkTextTheme.titleMedium,
   ),
   dividerTheme: DividerThemeData(
@@ -234,6 +245,7 @@ final ThemeData darkTheme = ThemeData(
     ),
     textStyle: _darkTextTheme.bodyMedium,
   ),
+  expansionTileTheme: _expansionTileTheme,
   iconButtonTheme: _iconBtnTheme,
   inputDecorationTheme: InputDecorationTheme(
     border: UnderlineInputBorder(borderRadius: BorderRadius.circular(10)),
@@ -260,7 +272,7 @@ final ThemeData darkTheme = ThemeData(
     dismissDirection: DismissDirection.down,
     elevation: 10,
     insetPadding: _padding,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    shape: _border,
     showCloseIcon: true,
   ),
   textButtonTheme: _textBtnTheme,

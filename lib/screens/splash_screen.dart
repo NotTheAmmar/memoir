@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:memoir/assets.dart';
+import 'package:memoir/classes/assets.dart';
 import 'package:memoir/extensions.dart';
 
 /// SplashScreen Page

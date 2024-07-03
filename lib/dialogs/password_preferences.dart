@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:memoir/config.dart';
+import 'package:memoir/classes/user_preferences.dart';
 import 'package:memoir/extensions.dart';
 
 /// Dialog for changing preferences for generating random password temporary (does not change the global settings)
@@ -169,10 +169,10 @@ class _PasswordPreferencesDialogState extends State<PasswordPreferencesDialog> {
                   child: Slider(
                     value: _passwordLen,
                     onChanged: _setPassLen,
-                    min: Config.instance.passwordLenRange.start,
-                    max: Config.instance.passwordLenRange.end,
-                    divisions: Config.instance.passwordLenRange.end.toInt() -
-                        Config.instance.passwordLenRange.start.toInt(),
+                    min: UserPreferences.instance.passwordLenRange.start,
+                    max: UserPreferences.instance.passwordLenRange.end,
+                    divisions: UserPreferences.instance.passwordLenRange.end.toInt() -
+                        UserPreferences.instance.passwordLenRange.start.toInt(),
                     label: "${_passwordLen.toInt()}",
                   ),
                 ),
