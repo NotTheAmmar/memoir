@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Handles the storage of data in [SharedPreferences]
-/// 
+///
 /// Call [initialize] before storing data
 class LocalStorage {
   /// For storing theme and password generator preferences

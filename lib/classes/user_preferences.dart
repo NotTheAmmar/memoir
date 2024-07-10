@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:memoir/classes/local_storage.dart';
-import 'package:memoir/classes/storage_key.dart';
+import 'package:memoir/classes/storage_keys.dart';
 
 /// Manages the user preferences
 ///
@@ -54,6 +54,12 @@ class UserPreferences extends ChangeNotifier {
     _storage.setString(StorageKey.themeMode, value.name);
 
     notifyListeners();
+  }
+
+  /// Master Password to access the vault
+  String get masterPassword => _storage.getString(StorageKey.masterPassword);
+  set masterPassword(String value) {
+    _storage.setString(StorageKey.masterPassword, value);
   }
 
   /// Whether a random generated password contains Letters
@@ -118,22 +124,55 @@ class UserPreferences extends ChangeNotifier {
     _storage.setDouble(StorageKey.passwordLen, value);
   }
 
-  /// Whether to require a fingerprint authentication at launch
+  /// Whether to require authentication at launch
+  ///
+  /// Sets [fingerprintOnly] to `false` when it is set to `false`
   ///
   /// Default: `false`
-  bool get authenticateOnLaunch {
-    return _storage.getBool(StorageKey.authenticateOnLaunch);
+  bool get appLock {
+    return _storage.getBool(StorageKey.authenticateToAccessVault);
   }
 
-  set authenticateOnLaunch(bool value) {
-    _storage.setBool(StorageKey.authenticateOnLaunch, value);
+  set appLock(bool value) {
+    _storage.setBool(StorageKey.authenticateToAccessVault, value);
+
+    if (!appLock) {
+      fingerprintOnly = false;
+    }
   }
 
-  /// Whether to use only fingerprint authentication at launch
+  /// Whether to use only fingerprint authentication
+  ///
+  /// It should not used without [appLock], thus it is set to `false` when [appLock] is set to `false`
   ///
   /// Default: `false`
   bool get fingerprintOnly => _storage.getBool(StorageKey.fingerprintOnly);
   set fingerprintOnly(bool value) {
     _storage.setBool(StorageKey.fingerprintOnly, value);
+  }
+
+  /// Whether to give a override choice when importing a duplicate container
+  ///
+  /// Default: `true`
+  bool get showOverrideChoice {
+    return _storage.getBool(StorageKey.showOverrideChoice, defaultValue: true);
+  }
+
+  set showOverrideChoice(bool value) {
+    _storage.setBool(StorageKey.showOverrideChoice, value);
+  }
+
+  /// Whether to keep the current container password or
+  /// replace it with the new password when importing a duplicate container
+  ///
+  /// Used when [showOverrideChoice] is `false`
+  ///
+  /// Default: `false`
+  bool get keepNewPassword {
+    return _storage.getBool(StorageKey.keepNewPassword);
+  }
+
+  set keepNewPassword(bool value) {
+    _storage.setBool(StorageKey.keepNewPassword, value);
   }
 }

@@ -69,6 +69,12 @@ class PasswordGenerator {
   /// Returns the password strength status
   ///
   /// Returns the string message and message color
+  /// 
+  /// `[Colors.greenAccent]` if it is `[PasswordStrength.strong]`
+  /// 
+  /// `[Colors.orangeAccent]` if it is `[PasswordStrength.good]`
+  /// 
+  /// `[Colors.redAccent]` if it is `[PasswordStrength.weak]`
   (String, Color) getStatus(String password) {
     if (password.isEmpty) return ('', Colors.grey);
 

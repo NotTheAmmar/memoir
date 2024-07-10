@@ -10,8 +10,9 @@ const EdgeInsets _padding = EdgeInsets.all(10);
 const InteractiveInkFeatureFactory _splashFactory = InkRipple.splashFactory;
 
 /// Default Shape Border
-final ShapeBorder _border =
-    RoundedRectangleBorder(borderRadius: BorderRadius.circular(10));
+final ShapeBorder _border = RoundedRectangleBorder(
+  borderRadius: BorderRadius.circular(10),
+);
 
 /// Base Color for Theme
 const Color _mainColor = Color(0xFFFFCE54);
@@ -39,9 +40,13 @@ final CardTheme _cardTheme = CardTheme(
 );
 
 /// Common Theme for Both [lightTheme] and [darkTheme]
-const ExpansionTileThemeData _expansionTileTheme = ExpansionTileThemeData(
+final ExpansionTileThemeData _expansionTileTheme = ExpansionTileThemeData(
   childrenPadding: _padding,
   tilePadding: _padding,
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(10),
+    side: BorderSide.none,
+  ),
 );
 
 /// Common Theme for Both [lightTheme] and [darkTheme]
@@ -160,14 +165,6 @@ final ThemeData lightTheme = ThemeData(
   useMaterial3: true,
   cardTheme: _cardTheme,
   colorScheme: _lightScheme,
-  dialogTheme: DialogTheme(
-    actionsPadding: _padding,
-    contentTextStyle: _lightTextTheme.bodyMedium,
-    elevation: 10,
-    insetPadding: _padding,
-    shape: _border,
-    titleTextStyle: _lightTextTheme.titleMedium,
-  ),
   dividerTheme: DividerThemeData(
     color: _lightScheme.secondary,
     indent: 10,
@@ -197,10 +194,17 @@ final ThemeData lightTheme = ThemeData(
     contentPadding: _padding,
     enableFeedback: true,
     style: ListTileStyle.list,
-    subtitleTextStyle: _lightTextTheme.bodySmall,
+    subtitleTextStyle: _lightTextTheme.bodySmall?.copyWith(color: Colors.grey),
     titleTextStyle: _lightTextTheme.bodyLarge,
   ),
   popupMenuTheme: _popupMenuTheme,
+  searchBarTheme: SearchBarThemeData(
+    elevation: const WidgetStatePropertyAll(10),
+    hintStyle: WidgetStatePropertyAll(_lightTextTheme.bodySmall?.copyWith(
+      color: Colors.grey,
+    )),
+    padding: const WidgetStatePropertyAll(EdgeInsets.all(5)),
+  ),
   snackBarTheme: SnackBarThemeData(
     backgroundColor: _lightScheme.inverseSurface,
     behavior: SnackBarBehavior.floating,
@@ -222,14 +226,6 @@ final ThemeData darkTheme = ThemeData(
   useMaterial3: true,
   cardTheme: _cardTheme,
   colorScheme: _darkScheme,
-  dialogTheme: DialogTheme(
-    actionsPadding: _padding,
-    contentTextStyle: _darkTextTheme.bodyMedium,
-    elevation: 10,
-    insetPadding: _padding,
-    shape: _border,
-    titleTextStyle: _darkTextTheme.titleMedium,
-  ),
   dividerTheme: DividerThemeData(
     color: _darkScheme.secondary,
     indent: 10,
@@ -259,10 +255,17 @@ final ThemeData darkTheme = ThemeData(
     contentPadding: const EdgeInsets.all(10),
     enableFeedback: true,
     style: ListTileStyle.list,
-    subtitleTextStyle: _darkTextTheme.bodySmall,
+    subtitleTextStyle: _darkTextTheme.bodySmall?.copyWith(color: Colors.grey),
     titleTextStyle: _darkTextTheme.bodyLarge,
   ),
   popupMenuTheme: _popupMenuTheme,
+  searchBarTheme: SearchBarThemeData(
+    elevation: const WidgetStatePropertyAll(10),
+    hintStyle: WidgetStatePropertyAll(_darkTextTheme.bodySmall?.copyWith(
+      color: Colors.grey,
+    )),
+    padding: const WidgetStatePropertyAll(EdgeInsets.all(5)),
+  ),
   snackBarTheme: SnackBarThemeData(
     backgroundColor: _darkScheme.inverseSurface,
     behavior: SnackBarBehavior.floating,

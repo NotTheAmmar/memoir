@@ -1,7 +1,10 @@
-/// Contains Keys for storing various data
+/// Contains Keys for storing various data in [SharedPreferences]
 abstract final class StorageKey {
   /// Theme Mode Key
   static const String themeMode = "themeMode";
+
+  /// Master Password Key
+  static const String masterPassword = "masterPassword";
 
   /// Use Letters Key
   static const String useLetters = "useLetters";
@@ -25,8 +28,14 @@ abstract final class StorageKey {
   static const String passwordLen = "passwordLen";
 
   /// Authentication Key
-  static const String authenticateOnLaunch = "authenticationOnLaunch";
+  static const String authenticateToAccessVault = "authenticateToAccessVault";
 
   /// Fingerprint only Authentication Key
   static const String fingerprintOnly = "fingerprintOnly";
+
+  /// Override Choice Key
+  static const String showOverrideChoice = "showOverrideChoice";
+
+  /// Password Keep Key
+  static const String keepNewPassword = "keepNewPassword";
 }

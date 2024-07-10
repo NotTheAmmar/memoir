@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:memoir/classes/database.dart';
 import 'package:memoir/classes/password_generator.dart';
@@ -81,9 +82,6 @@ class _NewContainerSheetState extends State<NewContainerSheet> {
     return value == null || value.isEmpty ? "Required" : null;
   }
 
-  /// Password Setter for randomly generator password
-  void _setPassword(String password) => _passwordCtrl.text = password;
-
   /// Creates a new Password Entry and closes the ModalBottomSheet
   ///
   /// It first validates the form fields
@@ -107,7 +105,19 @@ class _NewContainerSheetState extends State<NewContainerSheet> {
   Widget build(BuildContext context) {
     return Sheet(
       children: [
-        Text("New Container", style: context.textTheme.titleSmall),
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            Text("New Container", style: context.textTheme.titleSmall),
+            Align(
+              alignment: Alignment.centerRight,
+              child: IconButton(
+                onPressed: _addContainer,
+                icon: const FaIcon(FontAwesomeIcons.check),
+              ),
+            ),
+          ],
+        ),
         const Gap(20),
         Form(
           key: _key,
@@ -128,7 +138,9 @@ class _NewContainerSheetState extends State<NewContainerSheet> {
                   hintStyle: context.textTheme.bodySmall?.copyWith(
                     color: Colors.grey,
                   ),
-                  suffixIcon: PasswordTools(randomPasswordSetter: _setPassword),
+                  suffixIcon: PasswordTools(
+                    randomPasswordSetter: (value) => _passwordCtrl.text = value,
+                  ),
                   counterText: _passwordStatus,
                   counterStyle: context.textTheme.bodySmall?.copyWith(
                     color: _passwordStatusColor,
@@ -140,8 +152,8 @@ class _NewContainerSheetState extends State<NewContainerSheet> {
             ],
           ),
         ),
-        const Gap(20),
-        FilledButton(onPressed: _addContainer, child: const Text("Create")),
+        // const Gap(20),
+        // FilledButton(onPressed: , child: const Text("Create")),
       ],
     );
   }

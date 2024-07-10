@@ -70,9 +70,6 @@ class _EditContainerSheetState extends State<EditContainerSheet> {
     });
   }
 
-  /// Closes the ModalBottomSheet
-  void _closeSheet() => context.navigator.pop();
-
   /// Updates the [my.Container] and closes the ModalBottomSheet
   ///
   /// It first validates the form data
@@ -112,9 +109,6 @@ class _EditContainerSheetState extends State<EditContainerSheet> {
     return value == null || value.isEmpty ? "Required" : null;
   }
 
-  /// Password setter for randomly generated password from [PasswordTools]
-  void _passwordSetter(String password) => _passwordCtrl.text = password;
-
   @override
   Widget build(BuildContext context) {
     return Sheet(
@@ -127,7 +121,7 @@ class _EditContainerSheetState extends State<EditContainerSheet> {
               alignment: Alignment.centerLeft,
               child: IconButton(
                 tooltip: 'Cancel',
-                onPressed: _closeSheet,
+                onPressed: () => context.navigator.pop(),
                 icon: const FaIcon(FontAwesomeIcons.xmark),
               ),
             ),
@@ -168,7 +162,7 @@ class _EditContainerSheetState extends State<EditContainerSheet> {
                     color: Colors.grey,
                   ),
                   suffixIcon: PasswordTools(
-                    randomPasswordSetter: _passwordSetter,
+                    randomPasswordSetter: (value) => _passwordCtrl.text = value,
                   ),
                   counterText: _passwordStatus,
                   counterStyle: context.textTheme.bodySmall?.copyWith(

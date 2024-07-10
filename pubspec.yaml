@@ -14,6 +14,7 @@ dependencies:
   android_path_provider:
   flutter_launcher_icons:
   file_picker:
+  flutter_exit_app: 
   font_awesome_flutter:
   gap:
   local_auth: 

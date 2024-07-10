@@ -3,8 +3,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:memoir/classes/database.dart';
 import 'package:memoir/classes/container.dart' as my;
-import 'package:memoir/dialogs/confirm.dart';
 import 'package:memoir/extensions.dart';
+import 'package:memoir/sheets/confirm_action.dart';
 import 'package:memoir/sheets/edit_container.dart';
 import 'package:memoir/sheets/widgets/sheet.dart';
 
@@ -41,15 +41,22 @@ class _ContainerSheetState extends State<ContainerSheet> {
     });
   }
 
-  /// Pops up [ConfirmDialog] on the screen
+  /// Pops up [ConfirmActionSheet] on the screen
   void showConfirmDialog(BuildContext context) {
     // Here bool refers to whether to delete the container or not
-    showDialog<bool>(
-      barrierDismissible: false,
+    showModalBottomSheet<bool>(
+      elevation: 10,
+      enableDrag: false,
+      isDismissible: false,
       context: context,
-      builder: (_) => const ConfirmDialog(title: "Delete Container"),
-    ).then((deleteContainer) {
-      if (deleteContainer ?? false) {
+      builder: (_) => const ConfirmActionSheet(
+        title: "Delete Container",
+        content: "This will permanently remove the Container",
+        declineText: "Cancel",
+        acceptText: "Discard",
+      ),
+    ).then((delete) {
+      if (delete ?? false) {
         SQLite.instance.removeContainer(widget.container.id);
 
         // Popping false to avoid the SnackBar message
@@ -65,14 +72,22 @@ class _ContainerSheetState extends State<ContainerSheet> {
         onTap: () => showEditContainerSheet(context),
         child: const Padding(
           padding: EdgeInsets.all(10),
-          child: Row(children: [Icon(Icons.edit), Gap(20), Text("Edit")]),
+          child: Row(children: [
+            FaIcon(FontAwesomeIcons.penRuler),
+            Gap(20),
+            Text("Edit")
+          ]),
         ),
       ),
       PopupMenuItem(
         onTap: () => showConfirmDialog(context),
         child: const Padding(
           padding: EdgeInsets.all(10),
-          child: Row(children: [Icon(Icons.delete), Gap(20), Text("Delete")]),
+          child: Row(children: [
+            FaIcon(FontAwesomeIcons.trashCan),
+            Gap(20),
+            Text("Delete")
+          ]),
         ),
       ),
     ];

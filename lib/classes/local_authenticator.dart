@@ -19,25 +19,28 @@ class LocalAuthenticator {
   /// `local_auth` plugin object for authentication
   final LocalAuthentication _authentication = LocalAuthentication();
 
-  /// Whether the user can authenticate meaning the user must have a fingerprint setup
+  /// Whether the user can authenticate meaning they have some device lock
   late final bool canAuthenticate;
+
+  /// Whether the user has fingerprint setup
+  late final bool hasFingerprint;
 
   /// Preforms initialization tasks
   Future<void> initialize() async {
-    if (await _authentication.canCheckBiometrics) {
+    canAuthenticate = await _authentication.canCheckBiometrics;
+
+    if (canAuthenticate) {
       final List<BiometricType> biometrics =
           await _authentication.getAvailableBiometrics();
 
-      canAuthenticate = biometrics.contains(BiometricType.strong);
-    } else {
-      canAuthenticate = false;
+      hasFingerprint = biometrics.contains(BiometricType.strong);
     }
   }
 
-  /// Prompts the user to authenticate with fingerprint only
+  /// Prompts the user to authenticate based on their preference i.e. fingerprint or not
   Future<bool> authenticate() {
     return _authentication.authenticate(
-      localizedReason: "Verify your Identity",
+      localizedReason: "Unlock",
       options: AuthenticationOptions(
         stickyAuth: true,
         biometricOnly: UserPreferences.instance.fingerprintOnly,
