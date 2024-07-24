@@ -1,12 +1,16 @@
+import 'package:encrypt_shared_preferences/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:memoir/app/app.dart';
 import 'package:memoir/classes/database.dart';
+import 'package:memoir/classes/local_authenticator.dart';
+import 'package:memoir/classes/user_preferences.dart';
 import 'package:memoir/screens/error.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 /// Entry Point of the Application
 ///
-/// Initializes [SQLite] Database before launching the app
+/// Performs initialization takes before launching the app
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -14,7 +18,16 @@ void main() {
     return ErrorPage(errorDetails: errorDetails);
   };
 
-  SQLite.instance.initDatabase().then((_) => runApp(const App()));
+  Future.wait([
+    dotenv.load().then((_) async {
+      return EncryptedSharedPreferences.initialize(
+        dotenv.env["SHARED_PREFERENCES_ENCRYPTION_KEY"]!,
+      );
+    }),
+    SQLite.initDatabase(),
+    UserPreferences.initializeStorage(),
+    LocalAuthenticator.initialize()
+  ]).then((_) => runApp(const App()));
 }
 
 /// Checks and requests the Storage Permission required for Export and Import of Containers

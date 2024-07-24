@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:memoir/classes/password_generator.dart';
-import 'package:memoir/config.dart';
-import 'package:memoir/dialogs/password_preferences.dart';
+import 'package:memoir/classes/user_preferences.dart';
+import 'package:memoir/sheets/password_preferences.dart';
 
 /// Handles generating random password and preferences for generating random password
 ///
@@ -21,31 +21,31 @@ class _PasswordToolsState extends State<PasswordTools> {
   /// Current setting preference of `Using Letters` for generating random password
   ///
   /// Default Value is of Config, essentially the global setting
-  bool _useLetters = Config.instance.useLetters;
+  bool _useLetters = UserPreferences.useLetters;
 
   /// Current setting preference of `Including Uppercase Letters` in randomly generated passwords
   ///
   /// Default Value is of Config, essentially the global setting
-  bool _includeUppercase = Config.instance.includeUppercase;
+  bool _includeUppercase = UserPreferences.includeUppercase;
 
   /// Current setting preference of `Including Number` in randomly generated passwords
   ///
   /// Default Value is of Config, essentially the global setting
-  bool _includeNumbers = Config.instance.includeNumbers;
+  bool _includeNumbers = UserPreferences.includeNumbers;
 
   /// Current setting preference of `Including Special Characters` in randomly generated passwords
   ///
   /// Default Value is of Config, essentially the global setting
-  bool _includeSpecialChars = Config.instance.includeSpecialChars;
+  bool _includeSpecialChars = UserPreferences.includeSpecialChars;
 
   /// Current setting preference of `Password Length` for generating random passwords
   ///
   /// Default Value is of Config, essentially the global setting
-  double _passLen = Config.instance.passwordLen;
+  double _passLen = UserPreferences.passwordLen;
 
   /// Generates a random password and calls the password setter for parent
   void _generateRandomPassword() {
-    widget.randomPasswordSetter(PasswordGenerator.instance.randomPassword(
+    widget.randomPasswordSetter(PasswordGenerator.randomPassword(
       letters: _useLetters,
       uppercase: _includeUppercase,
       numbers: _includeNumbers,
@@ -54,18 +54,20 @@ class _PasswordToolsState extends State<PasswordTools> {
     ));
   }
 
-  /// Shows the `Password Preference` dialog
-  void _showPasswordPreferencesDialog() {
+  /// Shows the `Password Preferences` BottomSheet
+  void _showPasswordPreferencesSheet() {
     // Parameters
     // 1 - Letters
     // 2 - Uppercase
     // 3 - Numbers
     // 4 - Special Characters
     // 5 - Length
-    showDialog<(bool, bool, bool, bool, double)>(
-      barrierDismissible: false,
+    showModalBottomSheet<(bool, bool, bool, bool, double)>(
+      elevation: 10,
+      enableDrag: false,
+      isDismissible: false,
       context: context,
-      builder: (_) => PasswordPreferencesDialog(
+      builder: (_) => PasswordPreferencesSheet(
         useLetters: _useLetters,
         includeUppercase: _includeUppercase,
         includeNumbers: _includeNumbers,
@@ -95,7 +97,7 @@ class _PasswordToolsState extends State<PasswordTools> {
         ),
         IconButton(
           tooltip: 'Preferences',
-          onPressed: _showPasswordPreferencesDialog,
+          onPressed: _showPasswordPreferencesSheet,
           icon: const FaIcon(FontAwesomeIcons.sliders),
         ),
       ],

@@ -3,8 +3,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:memoir/classes/database.dart';
 import 'package:memoir/classes/container.dart' as my;
-import 'package:memoir/dialogs/confirm.dart';
 import 'package:memoir/extensions.dart';
+import 'package:memoir/sheets/confirm_action.dart';
 import 'package:memoir/sheets/edit_container.dart';
 import 'package:memoir/sheets/widgets/sheet.dart';
 
@@ -21,9 +21,11 @@ class ContainerSheet extends StatefulWidget {
 
 class _ContainerSheetState extends State<ContainerSheet> {
   /// Whether password is visible or not
-  bool _passVisibility = false;
+  bool _visibility = false;
 
   /// Pushes [EditContainerSheet] on a ModalBottomSheet
+  ///
+  /// takes context due to PopupMenuBuilder
   void showEditContainerSheet(BuildContext context) {
     // Here bool refers to whether the Container was updated
     showModalBottomSheet<bool>(
@@ -41,16 +43,25 @@ class _ContainerSheetState extends State<ContainerSheet> {
     });
   }
 
-  /// Pops up [ConfirmDialog] on the screen
+  /// Pops up [ConfirmActionSheet] on the screen
+  ///
+  /// takes context due to PopupMenuBuilder
   void showConfirmDialog(BuildContext context) {
     // Here bool refers to whether to delete the container or not
-    showDialog<bool>(
-      barrierDismissible: false,
+    showModalBottomSheet<bool>(
+      elevation: 10,
+      enableDrag: false,
+      isDismissible: false,
       context: context,
-      builder: (_) => const ConfirmDialog(title: "Delete Container"),
-    ).then((deleteContainer) {
-      if (deleteContainer ?? false) {
-        SQLite.instance.removeContainer(widget.container.id);
+      builder: (_) => const ConfirmActionSheet(
+        title: "Delete Container",
+        content: "This will permanently remove the Container",
+        declineText: "Cancel",
+        acceptText: "Discard",
+      ),
+    ).then((delete) {
+      if (delete ?? false) {
+        SQLite.removeContainer(widget.container.id);
 
         // Popping false to avoid the SnackBar message
         context.navigator.pop(false);
@@ -65,23 +76,33 @@ class _ContainerSheetState extends State<ContainerSheet> {
         onTap: () => showEditContainerSheet(context),
         child: const Padding(
           padding: EdgeInsets.all(10),
-          child: Row(children: [Icon(Icons.edit), Gap(20), Text("Edit")]),
+          child: Row(
+            children: [
+              FaIcon(FontAwesomeIcons.penRuler),
+              Gap(20),
+              Text("Edit")
+            ],
+          ),
         ),
       ),
       PopupMenuItem(
         onTap: () => showConfirmDialog(context),
         child: const Padding(
           padding: EdgeInsets.all(10),
-          child: Row(children: [Icon(Icons.delete), Gap(20), Text("Delete")]),
+          child: Row(
+            children: [
+              FaIcon(FontAwesomeIcons.trashCan),
+              Gap(20),
+              Text("Delete")
+            ],
+          ),
         ),
       ),
     ];
   }
 
   /// Toggles the Password Visibility
-  void _toggleVisibility() {
-    setState(() => _passVisibility = !_passVisibility);
-  }
+  void _toggleVisibility() => setState(() => _visibility = !_visibility);
 
   @override
   Widget build(BuildContext context) {
@@ -104,17 +125,17 @@ class _ContainerSheetState extends State<ContainerSheet> {
             overflow: TextOverflow.ellipsis,
           ),
           subtitle: Text(
-            _passVisibility
+            _visibility
                 ? widget.container.password
                 : "*" * widget.container.password.length,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           trailing: IconButton(
-            tooltip: 'Toggle Visibility',
+            tooltip: _visibility ? "Hide Password" : "Show Password",
             onPressed: _toggleVisibility,
             icon: FaIcon(
-              _passVisibility
+              _visibility
                   ? FontAwesomeIcons.solidEye
                   : FontAwesomeIcons.solidEyeSlash,
             ),

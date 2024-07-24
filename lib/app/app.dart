@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:memoir/app/theme.dart';
-import 'package:memoir/config.dart';
-import 'package:memoir/screens/home/home.dart';
+import 'package:memoir/classes/routes.dart';
+import 'package:memoir/classes/user_preferences.dart';
+import 'package:memoir/screens/qr_scanner.dart';
+import 'package:memoir/screens/settings/appearance.dart';
+import 'package:memoir/screens/settings/backup_restore.dart';
+import 'package:memoir/screens/settings/password_generation.dart';
+import 'package:memoir/screens/settings/security.dart';
+import 'package:memoir/screens/vault/vault.dart';
+import 'package:memoir/screens/authentication.dart';
 import 'package:memoir/screens/settings/settings.dart';
+import 'package:memoir/screens/setup.dart';
 import 'package:memoir/screens/splash_screen.dart';
 
 /// Base [MaterialApp] Class
@@ -14,18 +22,27 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: Config.instance,
+      animation: UserPreferences.themeNotifier,
       builder: (_, __) {
         return MaterialApp(
           title: 'Memoir',
           theme: lightTheme,
           darkTheme: darkTheme,
-          themeMode: Config.instance.themeMode,
+          themeMode: UserPreferences.themeMode,
           initialRoute: '/splashScreen',
           routes: {
-            '/splashScreen': (_) => const SplashScreen(),
-            '/homePage': (_) => const HomePage(),
-            '/settings': (_) => const Settings(),
+            Routes.splashScreen: (_) => const SplashScreen(),
+            Routes.setup: (_) => const SetupPage(),
+            Routes.authentication: (_) => const AuthenticationPage(),
+            Routes.vault: (_) => const VaultPage(),
+            Routes.settings: (_) => const Settings(),
+            Routes.appearanceSettings: (_) => const AppearanceSettings(),
+            Routes.passwordGenerationSettings: (_) {
+              return const PasswordGenerationSettings();
+            },
+            Routes.securitySettings: (_) => const SecuritySettings(),
+            Routes.backupRestoreSettings: (_) => const BackupRestoreSettings(),
+            Routes.qrScanner: (_) => const QRScannerPage(),
           },
         );
       },

@@ -60,9 +60,7 @@ class _EditContainerSheetState extends State<EditContainerSheet> {
 
   /// Listener to update the password strength whenever the password is updated
   void _passwordListener() {
-    final (status, color) = PasswordGenerator.instance.getStatus(
-      _passwordCtrl.text,
-    );
+    final (status, color) = PasswordGenerator.getStatus(_passwordCtrl.text);
 
     setState(() {
       _passwordStatus = status;
@@ -70,14 +68,11 @@ class _EditContainerSheetState extends State<EditContainerSheet> {
     });
   }
 
-  /// Closes the ModalBottomSheet
-  void _closeSheet() => context.navigator.pop();
-
   /// Updates the [my.Container] and closes the ModalBottomSheet
   ///
   /// It first validates the form data
   void _updateContainer() {
-    final Future<bool> result = SQLite.instance.doesNameExists(
+    final Future<bool> result = SQLite.doesNameExists(
       _nameCtrl.text,
       id: widget.container.id,
     );
@@ -87,7 +82,7 @@ class _EditContainerSheetState extends State<EditContainerSheet> {
 
       if (!_key.currentState!.validate()) return;
 
-      final Future<void> result = SQLite.instance.updateContainer(my.Container(
+      final Future<void> result = SQLite.updateContainer(my.Container(
         id: widget.container.id,
         name: _nameCtrl.text,
         password: _passwordCtrl.text,
@@ -112,9 +107,6 @@ class _EditContainerSheetState extends State<EditContainerSheet> {
     return value == null || value.isEmpty ? "Required" : null;
   }
 
-  /// Password setter for randomly generated password from [PasswordTools]
-  void _passwordSetter(String password) => _passwordCtrl.text = password;
-
   @override
   Widget build(BuildContext context) {
     return Sheet(
@@ -126,15 +118,15 @@ class _EditContainerSheetState extends State<EditContainerSheet> {
             Align(
               alignment: Alignment.centerLeft,
               child: IconButton(
-                tooltip: 'Cancel',
-                onPressed: _closeSheet,
+                tooltip: "Discard Changes",
+                onPressed: () => context.navigator.pop(),
                 icon: const FaIcon(FontAwesomeIcons.xmark),
               ),
             ),
             Align(
               alignment: Alignment.centerRight,
               child: IconButton(
-                tooltip: 'Save Changes',
+                tooltip: "Save Changes",
                 onPressed: _updateContainer,
                 icon: const FaIcon(FontAwesomeIcons.solidFloppyDisk),
               ),
@@ -168,7 +160,7 @@ class _EditContainerSheetState extends State<EditContainerSheet> {
                     color: Colors.grey,
                   ),
                   suffixIcon: PasswordTools(
-                    randomPasswordSetter: _passwordSetter,
+                    randomPasswordSetter: (value) => _passwordCtrl.text = value,
                   ),
                   counterText: _passwordStatus,
                   counterStyle: context.textTheme.bodySmall?.copyWith(

@@ -1,36 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
-import 'package:memoir/config.dart';
+import 'package:memoir/classes/user_preferences.dart';
 import 'package:memoir/extensions.dart';
 
-/// General Settings
-class GeneralSettingsSection extends StatelessWidget {
-  const GeneralSettingsSection({super.key});
+/// Appearance Settings
+class AppearanceSettings extends StatelessWidget {
+  const AppearanceSettings({super.key});
 
   /// Updates ThemeMode when value changes for [DropdownButton]
   void _updateThemeMode(ThemeMode? value) {
     if (value == null) return;
 
-    Config.instance.themeMode = value;
+    UserPreferences.themeMode = value;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          "General",
-          style: context.textTheme.bodySmall?.copyWith(color: Colors.grey),
-        ),
-        const Gap(10),
-        ListTile(
+    return Scaffold(
+      appBar: AppBar(title: const Text("Appearance")),
+      body: Padding(
+        padding: const EdgeInsets.all(10),
+        child: ListTile(
           title: const Text("Theme"),
+          subtitle: const Text("Changes the Brightness"),
           trailing: DropdownButton<ThemeMode>(
             enableFeedback: true,
             style: context.textTheme.bodySmall,
-            value: Config.instance.themeMode,
+            value: UserPreferences.themeMode,
             items: const [
               DropdownMenuItem(
                 value: ThemeMode.system,
@@ -48,7 +43,7 @@ class GeneralSettingsSection extends StatelessWidget {
             onChanged: _updateThemeMode,
           ),
         ),
-      ],
+      ),
     );
   }
 }

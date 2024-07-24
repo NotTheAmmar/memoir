@@ -1,4 +1,5 @@
 import 'package:memoir/classes/container.dart';
+import 'package:memoir/classes/encryptor.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -6,53 +7,47 @@ import 'package:sqflite/sqflite.dart';
 ///
 /// Handles the Database Connection and provides all the relevant methods for storing, retrieving, and manipulating [Container]'s
 ///
-/// It is singleton class and data is to be accessed through [instance]
+/// [initDatabase] should be called before accessing any methods
 ///
 /// Table Metadata:
 ///
 /// Attributes:
-/// `*id` (Primary Key) => `Integer`,
-/// `*name` => `Text`,
+///
+/// `*id` (Primary Key) => `Integer`
+///
+/// `*name` => `Text`
+///
 /// `*password` => `Text`
 ///
 /// Constraints: `Unique(name, password)`
-class SQLite {
+abstract final class SQLite {
   /// Database Name
-  final String _databaseName = "vault";
+  static const String _databaseName = "vault";
 
   /// Table Name
-  final String _tableName = "containers";
-
-  /// Private Default Constructor
-  SQLite._();
-
-  /// Actual Instance
-  static final SQLite _instance = SQLite._();
-
-  /// Instance of the Class
-  ///
-  /// All the properties and methods are to be accessed through this
-  static SQLite get instance => _instance;
+  static const String _tableName = "containers";
 
   /// Database Object for SQLite
-  late final Database _database;
+  static late final Database _database;
 
   /// Creates the necessary Tables in the Database
-  void _onCreate(Database database, int _) {
+  static void _onCreate(Database database, int _) {
     database.execute(
-      "CREATE TABLE $_tableName("
-      "id INTEGER PRIMARY KEY AUTOINCREMENT,"
-      "name TEXT NOT NULL UNIQUE,"
-      "password TEXT NOT NULL,"
-      "UNIQUE(name, password)"
-      ")",
+      """
+      CREATE TABLE $_tableName(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL UNIQUE,
+        password TEXT NOT NULL,
+        UNIQUE(name, password)
+      )
+      """,
     );
   }
 
   /// Opens the Database
   ///
   /// If the database is opened for the first, it will create the necessary tables as well
-  Future<void> initDatabase() async {
+  static Future<void> initDatabase() async {
     _database = await openDatabase(
       join(await getDatabasesPath(), _databaseName),
       version: 1,
@@ -62,11 +57,13 @@ class SQLite {
 
   /// Adds a [Container] information
   ///
+  /// Also encrypts the password
+  ///
   /// Make sure not to insert a duplicate `name`
-  Future<void> addContainer(String name, String password) async {
+  static Future<void> addContainer(String name, String password) async {
     final int lastRowID = await _database.rawInsert(
-      'INSERT INTO $_tableName(name, password) VALUES(?,?)',
-      [name, password],
+      "INSERT INTO $_tableName(name, password) VALUES(?,?)",
+      [name, Encryptor.encryptPassword(password)],
     );
 
     if (lastRowID == 0) addContainer(name, password);
@@ -77,9 +74,9 @@ class SQLite {
   /// To Maintain the Uniqueness of the `name` attribute
   ///
   /// Here [id] is of a container whose name is to be ignored when checking for duplicate names
-  Future<bool> doesNameExists(String name, {int id = 0}) async {
+  static Future<bool> doesNameExists(String name, {int id = 0}) async {
     final List<Map<String, dynamic>> result = await _database.rawQuery(
-      'SELECT COUNT(*) FROM $_tableName WHERE name = ? and id <> ?',
+      "SELECT COUNT(*) FROM $_tableName WHERE name = ? and id <> ?",
       [name, id],
     );
 
@@ -90,12 +87,12 @@ class SQLite {
   ///
   /// For example: 'Password N',
   /// where N starts from 1 and gets incremented for each password
-  Future<String> getDefaultContainerName() async {
+  static Future<String> getDefaultContainerName() async {
     final List<Map<String, dynamic>> commonNames = await _database.rawQuery(
       "SELECT name FROM $_tableName WHERE name LIKE 'Password %' ORDER BY name",
     );
 
-    int n = 1;
+    int nextN = 1;
     if (commonNames.isNotEmpty) {
       // Getting Ns from 'Password N'
       List<int> nums = [];
@@ -105,7 +102,7 @@ class SQLite {
 
       // No number missing from sequence
       if (nums.last == nums.length) {
-        n = nums.last + 1;
+        nextN = nums.last + 1;
 
         // One number missing from sequence
       } else if (nums.last == nums.length - 1) {
@@ -114,28 +111,30 @@ class SQLite {
           (index) => index + 1,
         ).reduce((value, element) => value + element);
 
-        int currentNumSum = nums.reduce((value, element) => value + element);
+        int currentSum = nums.reduce((value, element) => value + element);
 
-        n = oneToNSum - currentNumSum;
+        nextN = oneToNSum - currentSum;
 
         // Some numbers missing so finding the first missing numbers
       } else {
         for (int i = 1; i < nums.length; i++) {
           if (nums[i] - nums[i - 1] != 1) {
-            n = i + 1;
+            nextN = i + 1;
             break;
           }
         }
       }
     }
 
-    return 'Password $n';
+    return 'Password $nextN';
   }
 
   /// Returns a list of [Container] ordered by `name`
-  Future<List<Container>> getContainers() async {
+  ///
+  /// decrypts the password when retrieving
+  static Future<List<Container>> getContainers() async {
     final List<Map<String, dynamic>> containers = await _database.rawQuery(
-      'SELECT * FROM $_tableName ORDER BY name',
+      "SELECT * FROM $_tableName ORDER BY name",
     );
 
     return [
@@ -143,25 +142,27 @@ class SQLite {
         Container(
           id: container['id'],
           name: container['name'],
-          password: container['password'],
+          password: Encryptor.decryptPassword(container['password']),
         )
     ];
   }
 
   /// Update a [Container] `password` using `name`
-  Future<void> overridePassword(String name, String pass) async {
+  ///
+  /// Also encrypts the new password
+  static Future<void> overridePassword(String name, String password) async {
     final int changes = await _database.rawUpdate(
-      'UPDATE $_tableName SET password = ? WHERE name = ?',
-      [pass, name],
+      "UPDATE $_tableName SET password = ? WHERE name = ?",
+      [Encryptor.encryptPassword(password), name],
     );
 
-    if (changes == 0) overridePassword(name, pass);
+    if (changes == 0) overridePassword(name, password);
   }
 
   /// Removes a [Container] using its `id`
-  Future<void> removeContainer(int id) async {
+  static Future<void> removeContainer(int id) async {
     final int changes = await _database.rawDelete(
-      'DELETE FROM $_tableName WHERE id = ?',
+      "DELETE FROM $_tableName WHERE id = ?",
       [id],
     );
 
@@ -173,10 +174,16 @@ class SQLite {
   /// Cannot update its `id`
   ///
   /// Make sure the new `name` is Unique
-  Future<void> updateContainer(Container container) async {
+  ///
+  /// Also Encrypts the password
+  static Future<void> updateContainer(Container container) async {
     final int changes = await _database.rawUpdate(
-      'UPDATE $_tableName SET name = ?, password = ? WHERE id = ?',
-      [container.name, container.password, container.id],
+      "UPDATE $_tableName SET name = ?, password = ? WHERE id = ?",
+      [
+        container.name,
+        Encryptor.encryptPassword(container.password),
+        container.id
+      ],
     );
 
     if (changes == 0) updateContainer(container);
