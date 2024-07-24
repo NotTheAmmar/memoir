@@ -60,9 +60,7 @@ class _EditContainerSheetState extends State<EditContainerSheet> {
 
   /// Listener to update the password strength whenever the password is updated
   void _passwordListener() {
-    final (status, color) = PasswordGenerator.instance.getStatus(
-      _passwordCtrl.text,
-    );
+    final (status, color) = PasswordGenerator.getStatus(_passwordCtrl.text);
 
     setState(() {
       _passwordStatus = status;
@@ -74,7 +72,7 @@ class _EditContainerSheetState extends State<EditContainerSheet> {
   ///
   /// It first validates the form data
   void _updateContainer() {
-    final Future<bool> result = SQLite.instance.doesNameExists(
+    final Future<bool> result = SQLite.doesNameExists(
       _nameCtrl.text,
       id: widget.container.id,
     );
@@ -84,7 +82,7 @@ class _EditContainerSheetState extends State<EditContainerSheet> {
 
       if (!_key.currentState!.validate()) return;
 
-      final Future<void> result = SQLite.instance.updateContainer(my.Container(
+      final Future<void> result = SQLite.updateContainer(my.Container(
         id: widget.container.id,
         name: _nameCtrl.text,
         password: _passwordCtrl.text,
@@ -120,7 +118,7 @@ class _EditContainerSheetState extends State<EditContainerSheet> {
             Align(
               alignment: Alignment.centerLeft,
               child: IconButton(
-                tooltip: 'Cancel',
+                tooltip: "Discard Changes",
                 onPressed: () => context.navigator.pop(),
                 icon: const FaIcon(FontAwesomeIcons.xmark),
               ),
@@ -128,7 +126,7 @@ class _EditContainerSheetState extends State<EditContainerSheet> {
             Align(
               alignment: Alignment.centerRight,
               child: IconButton(
-                tooltip: 'Save Changes',
+                tooltip: "Save Changes",
                 onPressed: _updateContainer,
                 icon: const FaIcon(FontAwesomeIcons.solidFloppyDisk),
               ),

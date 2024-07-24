@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:memoir/app/theme.dart';
 import 'package:memoir/classes/routes.dart';
 import 'package:memoir/classes/user_preferences.dart';
+import 'package:memoir/screens/qr_scanner.dart';
 import 'package:memoir/screens/settings/appearance.dart';
 import 'package:memoir/screens/settings/backup_restore.dart';
 import 'package:memoir/screens/settings/password_generation.dart';
@@ -21,13 +22,13 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: UserPreferences.instance,
+      animation: UserPreferences.themeNotifier,
       builder: (_, __) {
         return MaterialApp(
           title: 'Memoir',
           theme: lightTheme,
           darkTheme: darkTheme,
-          themeMode: UserPreferences.instance.themeMode,
+          themeMode: UserPreferences.themeMode,
           initialRoute: '/splashScreen',
           routes: {
             Routes.splashScreen: (_) => const SplashScreen(),
@@ -41,6 +42,7 @@ class App extends StatelessWidget {
             },
             Routes.securitySettings: (_) => const SecuritySettings(),
             Routes.backupRestoreSettings: (_) => const BackupRestoreSettings(),
+            Routes.qrScanner: (_) => const QRScannerPage(),
           },
         );
       },

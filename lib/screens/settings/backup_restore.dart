@@ -7,11 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:memoir/classes/container.dart' as my;
 import 'package:memoir/classes/database.dart';
+import 'package:memoir/classes/encryptor.dart';
 import 'package:memoir/classes/user_preferences.dart';
 import 'package:memoir/extensions.dart';
 import 'package:memoir/main.dart';
 import 'package:memoir/screens/settings/widgets/expansion_list_tile.dart';
 import 'package:memoir/sheets/confirm_action.dart';
+import 'package:memoir/sheets/public_key_scanner.dart';
 
 /// Backup & Restore Settings
 class BackupRestoreSettings extends StatefulWidget {
@@ -33,61 +35,102 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
     super.initState();
 
     _radioGroupValue = (
-      UserPreferences.instance.showOverrideChoice,
-      UserPreferences.instance.keepNewPassword
+      UserPreferences.showOverrideChoice,
+      UserPreferences.keepNewPassword,
     );
   }
 
-  /// Exports Containers in binary file format to documents folder
-  ///
-  /// First Checks for storage permissions, if granted then executes
-  ///
-  /// After success, shows a [SnackBar] message
-  ///
-  /// Encodes data in Base64 format
-  Future<void> _exportContainers() async {
-    final bool permissionsGranted = await checkPermissions();
+  /// Encodes the containers in json then encrypts using the public key,
+  /// and exports to a `.bin` file
+  Future<void> _exportContainers(String? publicKey) async {
+    if (publicKey == null) return;
 
-    if (mounted && !permissionsGranted) {
+    final List<my.Container> containers = await SQLite.getContainers();
+
+    try {
+      final String jsonData = jsonEncode(containers);
+      final String encryptedData = Encryptor.encryptFile(jsonData, publicKey);
+      final List<int> dataBytes = utf8.encode(encryptedData);
+
+      final String documentsDir = await AndroidPathProvider.documentsPath;
+      final String date = DateTime.now().toString().substring(0, 10);
+      final File exportFile = await File(
+        "$documentsDir/Memoir/Backup $date.bin",
+      ).create(recursive: true);
+
+      await exportFile.writeAsBytes(dataBytes);
+
+      if (!mounted) return;
       context.messenger.showSnackBar(const SnackBar(
-        duration: Duration(seconds: 3),
+        duration: Duration(seconds: 2),
         showCloseIcon: true,
-        content: Text("Need Storage Permission"),
+        content: Text(
+          "Exported Containers to \"Internal Storage/Documents/Memoir\"",
+        ),
       ));
-
-      return;
+    } catch (exception) {
+      if (!mounted) return;
+      context.messenger.showSnackBar(const SnackBar(
+        duration: Duration(seconds: 2),
+        showCloseIcon: true,
+        content: Text("Invalid Public Key"),
+      ));
     }
-
-    final List<my.Container> containers = await SQLite.instance.getContainers();
-
-    final String jsonData = jsonEncode(containers);
-    final List<int> dataBytes = utf8.encode(jsonData);
-    final String base64Data = base64Encode(dataBytes);
-    final List<int> base64Bytes = utf8.encode(base64Data);
-
-    final String documentsDir = await AndroidPathProvider.documentsPath;
-    final String date = DateTime.now().toString().substring(0, 10);
-    final File exportFile = await File(
-      '$documentsDir/Memoir/Backup $date.bin',
-    ).create(recursive: true);
-
-    await exportFile.writeAsBytes(base64Bytes);
-
-    if (!mounted) return;
-    context.messenger.showSnackBar(const SnackBar(
-      content: Text(
-        "Exported Containers to \"Internal Storage/Documents/Memoir\"",
-      ),
-    ));
   }
 
-  /// Imports Containers from the exported binary file
-  ///
-  /// First Checks for storage permissions, if granted then executes
-  ///
-  /// Prompts the user to select the binary file, if not selected then aborts the process
-  ///
-  /// Reads the file then decodes the base64 data back to utf8 and starts to insert it in the database
+  /// Checks for storage permissions, if granted then
+  /// prompts the user to give a public key either through qrcode or clipboard then
+  /// exports the passwords encrypted using the key
+  void _onBackupTapped() {
+    checkPermissions().then((granted) {
+      if (!granted) {
+        context.messenger.showSnackBar(const SnackBar(
+          duration: Duration(seconds: 3),
+          showCloseIcon: true,
+          content: Text("Need Storage Permission"),
+        ));
+
+        return;
+      }
+
+      showModalBottomSheet<String>(
+        elevation: 10,
+        enableDrag: false,
+        isDismissible: false,
+        context: context,
+        builder: (_) => const PublicKeyScannerSheet(),
+      ).then(_exportContainers);
+    });
+  }
+
+  /// Based on UserPreference, asks the user whether to override an already
+  /// existing password
+  Future<bool> _shouldOverridePassword(String container) async {
+    if (UserPreferences.showOverrideChoice) {
+      if (!mounted) return false;
+      final bool? choiceResult = await showModalBottomSheet<bool>(
+        elevation: 10,
+        enableDrag: false,
+        isDismissible: false,
+        context: context,
+        builder: (_) => ConfirmActionSheet(
+          title: 'Override $container Password',
+          content:
+              "Doing so will replace the current Password with new Password",
+          declineText: "Keep Old",
+          acceptText: "Keep New",
+        ),
+      );
+
+      return choiceResult ?? false;
+    }
+
+    return UserPreferences.keepNewPassword;
+  }
+
+  /// Reads the file then decrypts the file with device private key
+  /// then decodes the json data and
+  /// starts to insert it in the database
   ///
   /// If Container with a name already exists,
   /// the user is given a choice whether to override the password
@@ -96,108 +139,102 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
   /// The user is asked for every duplicate container
   ///
   /// After successful import, a [SnackBar] message is shown
-  Future<void> _importContainers() async {
-    final bool permissionsGranted = await checkPermissions();
+  Future<void> _importContainers(String path) async {
+    try {
+      final File importFile = File(path);
 
-    if (mounted && !permissionsGranted) {
-      context.messenger.showSnackBar(const SnackBar(
-        duration: Duration(seconds: 3),
-        showCloseIcon: true,
-        content: Text("Need Storage Permission"),
-      ));
+      final List<int> rawBytes = importFile.readAsBytesSync();
+      final String encryptedData = utf8.decode(rawBytes);
+      final String jsonData = Encryptor.decryptFile(encryptedData);
+      // Do not annotate the list, cannot be typecasted
+      List data = jsonDecode(jsonData);
 
-      return;
-    }
+      // Implicitly Looping over every container
+      await Future.forEach(data, (container) async {
+        final bool doesNameExists = await SQLite.doesNameExists(
+          container['name'],
+        );
 
-    final FilePickerResult? pickedFile = await FilePicker.platform.pickFiles(
-      allowMultiple: false,
-      dialogTitle: "Pick Json File",
-      allowedExtensions: ['bin'],
-      initialDirectory: await AndroidPathProvider.documentsPath,
-      type: FileType.custom,
-    );
+        if (doesNameExists) {
+          // Container with duplicate name
 
-    if (pickedFile == null) return;
-
-    final File importFile = File(pickedFile.files.first.path!);
-
-    final List<int> rawBytes = importFile.readAsBytesSync();
-    final String base64Data = utf8.decode(rawBytes);
-    final List<int> dataBytes = base64Decode(base64Data);
-    final String jsonData = utf8.decode(dataBytes);
-
-    // Do not annotate the list, cannot be typecasted
-    List data = jsonDecode(jsonData);
-
-    // Implicitly Looping over every container
-    await Future.forEach(data, (container) async {
-      final Future<bool> doesNameExists = SQLite.instance.doesNameExists(
-        container['name'],
-      );
-
-      if (await doesNameExists) {
-        // Container with duplicate name
-
-        if (UserPreferences.instance.showOverrideChoice) {
-          if (!mounted) return;
-          final Future<bool?> choiceResult = showModalBottomSheet<bool>(
-            elevation: 10,
-            enableDrag: false,
-            isDismissible: false,
-            context: context,
-            builder: (_) => ConfirmActionSheet(
-              title: 'Override ${container['name']} Password',
-              content:
-                  "Doing so will replace the current Password with new Password",
-              declineText: "Keep Old",
-              acceptText: "Keep New",
-            ),
+          final bool overridePassword = await _shouldOverridePassword(
+            container["name"],
           );
 
-          // Checking if the user wants to override the
-          if (await choiceResult ?? false) {
-            return SQLite.instance.overridePassword(
-              container['name']!,
-              container['password']!,
+          if (overridePassword) {
+            return SQLite.overridePassword(
+              container['name'],
+              container['password'],
             );
           }
+
+          // No Container with same name exists
         } else {
-          if (UserPreferences.instance.keepNewPassword) {
-            return SQLite.instance.overridePassword(
-              container['name']!,
-              container['password']!,
-            );
-          }
+          return SQLite.addContainer(container['name'], container['password']);
         }
+      });
 
-        // No Container with same exists
-      } else {
-        return SQLite.instance.addContainer(
-          container['name']!,
-          container['password']!,
-        );
+      _didImport = true;
+
+      if (!mounted) return;
+      context.messenger.showSnackBar(const SnackBar(
+        content: Text("Imported Containers"),
+      ));
+    } catch (exception) {
+      if (!mounted) return;
+      context.messenger.showSnackBar(const SnackBar(
+        duration: Duration(seconds: 2),
+        showCloseIcon: true,
+        content: Text("Failed to Decrypt the Backup"),
+      ));
+    }
+  }
+
+  /// Checks for storage permissions, if granted then
+  /// prompts the user to select the binary file, after selected
+  /// imports all the containers
+  void _onRestoreTapped() {
+    checkPermissions().then((granted) {
+      if (!granted) {
+        context.messenger.showSnackBar(const SnackBar(
+          duration: Duration(seconds: 3),
+          showCloseIcon: true,
+          content: Text("Need Storage Permission"),
+        ));
+
+        return;
       }
+
+      AndroidPathProvider.documentsPath.then((directory) {
+        final Future<FilePickerResult?> result = FilePicker.platform.pickFiles(
+          allowMultiple: false,
+          dialogTitle: "Pick Json File",
+          allowedExtensions: ['bin'],
+          initialDirectory: directory,
+          type: FileType.custom,
+        );
+
+        result.then((file) {
+          if (file == null) return;
+
+          _importContainers(file.paths.first!);
+        });
+      });
     });
-
-    _didImport = true;
-
-    if (!mounted) return;
-    context.messenger.showSnackBar(const SnackBar(
-      content: Text("Imported Containers"),
-    ));
   }
 
   /// To update the import (override) settings radio button value when changed
   void _onRadioButtonSelected((bool, bool)? selected) {
     (bool, bool) value = selected ?? (false, false);
 
-    UserPreferences.instance.showOverrideChoice = value.$1;
-    UserPreferences.instance.keepNewPassword = value.$2;
+    UserPreferences.showOverrideChoice = value.$1;
+    UserPreferences.keepNewPassword = value.$2;
 
     setState(() {
       _radioGroupValue = (
-        UserPreferences.instance.showOverrideChoice,
-        UserPreferences.instance.keepNewPassword
+        UserPreferences.showOverrideChoice,
+        UserPreferences.keepNewPassword,
       );
     });
   }
@@ -217,13 +254,13 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
         padding: const EdgeInsets.all(10),
         children: [
           ListTile(
-            onTap: _exportContainers,
+            onTap: _onBackupTapped,
             leading: const FaIcon(FontAwesomeIcons.upload),
             title: const Text("Backup Containers"),
             subtitle: const Text("Saves Containers to device"),
           ),
           ExpansionListTile(
-            onTap: _importContainers,
+            onTap: _onRestoreTapped,
             leading: const FaIcon(FontAwesomeIcons.download),
             title: "Restore Containers",
             subtitle:

@@ -37,6 +37,8 @@ class ContainerList extends StatelessWidget {
 
         if (updated) {
           context.messenger.showSnackBar(const SnackBar(
+            duration: Duration(seconds: 2),
+            showCloseIcon: true,
             content: Text("Container Updated"),
           ));
         }

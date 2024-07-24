@@ -32,8 +32,9 @@ class PasswordPreferencesSheet extends StatefulWidget {
   });
 
   @override
-  State<PasswordPreferencesSheet> createState() =>
-      _PasswordPreferencesSheetState();
+  State<PasswordPreferencesSheet> createState() {
+    return _PasswordPreferencesSheetState();
+  }
 }
 
 class _PasswordPreferencesSheetState extends State<PasswordPreferencesSheet> {
@@ -74,8 +75,6 @@ class _PasswordPreferencesSheetState extends State<PasswordPreferencesSheet> {
   }
 
   /// Updates the `useLetters` value
-  ///
-  /// Causes rebuilt of the widget
   void _setUseLetters(bool? value) {
     if (value == null) return;
 
@@ -83,8 +82,6 @@ class _PasswordPreferencesSheetState extends State<PasswordPreferencesSheet> {
   }
 
   /// Updates the `includeUppercase` value
-  ///
-  /// Causes rebuilt of the widget
   void _setIncludeUppercase(bool? value) {
     if (value == null) return;
 
@@ -92,8 +89,6 @@ class _PasswordPreferencesSheetState extends State<PasswordPreferencesSheet> {
   }
 
   /// Updates the `includeNumbers` value
-  ///
-  /// Causes rebuilt of the widget
   void _setIncludeNumbers(bool? value) {
     if (value == null) return;
 
@@ -101,8 +96,6 @@ class _PasswordPreferencesSheetState extends State<PasswordPreferencesSheet> {
   }
 
   /// Updates the `includeSpecialChars` value
-  ///
-  /// Causes rebuilt of the widget
   void _setIncludeSpecialChars(bool? value) {
     if (value == null) return;
 
@@ -110,8 +103,6 @@ class _PasswordPreferencesSheetState extends State<PasswordPreferencesSheet> {
   }
 
   /// Updates the `passLen` value
-  ///
-  /// Causes rebuilt of the widget
   void _setPassLen(double value) {
     setState(() => _passwordLen = value);
   }
@@ -127,16 +118,16 @@ class _PasswordPreferencesSheetState extends State<PasswordPreferencesSheet> {
             Align(
               alignment: Alignment.centerLeft,
               child: IconButton(
-                tooltip: 'Back',
+                tooltip: "Back",
                 // Pops the dialog without saving changes to preferences
-                onPressed: () => context.navigator.pop(),
+                onPressed: context.navigator.pop,
                 icon: const FaIcon(FontAwesomeIcons.anglesLeft),
               ),
             ),
             Align(
               alignment: Alignment.centerRight,
               child: IconButton(
-                tooltip: 'Save Preferences',
+                tooltip: "Save",
                 // Pops the dialog while saving changes to preferences
                 onPressed: () => context.navigator.pop((
                   _useLetters,
@@ -184,11 +175,10 @@ class _PasswordPreferencesSheetState extends State<PasswordPreferencesSheet> {
                 child: Slider(
                   value: _passwordLen,
                   onChanged: _setPassLen,
-                  min: UserPreferences.instance.passwordLenRange.start,
-                  max: UserPreferences.instance.passwordLenRange.end,
-                  divisions: UserPreferences.instance.passwordLenRange.end
-                          .toInt() -
-                      UserPreferences.instance.passwordLenRange.start.toInt(),
+                  min: UserPreferences.passwordLenRange.start,
+                  max: UserPreferences.passwordLenRange.end,
+                  divisions: UserPreferences.passwordLenRange.end.toInt() -
+                      UserPreferences.passwordLenRange.start.toInt(),
                 ),
               ),
               Text("${_passwordLen.toInt()}"),

@@ -3,8 +3,23 @@ abstract final class StorageKey {
   /// Theme Mode Key
   static const String themeMode = "themeMode";
 
+  /// Authentication Key
+  static const String appLock = "appLock";
+
+  /// Fingerprint only Authentication Key
+  static const String fingerprintOnly = "fingerprintOnly";
+
   /// Master Password Key
   static const String masterPassword = "masterPassword";
+
+  /// AES Key
+  static const String aesKey = "AESKey";
+
+  /// RSA Private Key
+  static const String privateKey = "privateKey";
+
+  /// RSA Public  Key
+  static const String publicKey = "publicKey";
 
   /// Use Letters Key
   static const String useLetters = "useLetters";
@@ -26,12 +41,6 @@ abstract final class StorageKey {
 
   /// Password Length Key
   static const String passwordLen = "passwordLen";
-
-  /// Authentication Key
-  static const String authenticateToAccessVault = "authenticateToAccessVault";
-
-  /// Fingerprint only Authentication Key
-  static const String fingerprintOnly = "fingerprintOnly";
 
   /// Override Choice Key
   static const String showOverrideChoice = "showOverrideChoice";

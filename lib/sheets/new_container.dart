@@ -38,7 +38,7 @@ class _NewContainerSheetState extends State<NewContainerSheet> {
   void initState() {
     super.initState();
 
-    SQLite.instance.getDefaultContainerName().then((name) {
+    SQLite.getDefaultContainerName().then((name) {
       _nameCtrl.text = name;
     });
 
@@ -57,9 +57,7 @@ class _NewContainerSheetState extends State<NewContainerSheet> {
 
   /// Listener to update the password strength whenever the password is updated
   void _passwordListener() {
-    final (status, color) = PasswordGenerator.instance.getStatus(
-      _passwordCtrl.text,
-    );
+    final (status, color) = PasswordGenerator.getStatus(_passwordCtrl.text);
 
     setState(() {
       _passwordStatus = status;
@@ -86,12 +84,12 @@ class _NewContainerSheetState extends State<NewContainerSheet> {
   ///
   /// It first validates the form fields
   void _addContainer() {
-    SQLite.instance.doesNameExists(_nameCtrl.text).then((value) {
+    SQLite.doesNameExists(_nameCtrl.text).then((value) {
       _isNameDuplicate = value;
 
       if (!_key.currentState!.validate()) return;
 
-      Future<void> result = SQLite.instance.addContainer(
+      Future<void> result = SQLite.addContainer(
         _nameCtrl.text,
         _passwordCtrl.text,
       );
@@ -112,6 +110,7 @@ class _NewContainerSheetState extends State<NewContainerSheet> {
             Align(
               alignment: Alignment.centerRight,
               child: IconButton(
+                tooltip: "Save",
                 onPressed: _addContainer,
                 icon: const FaIcon(FontAwesomeIcons.check),
               ),
@@ -152,8 +151,6 @@ class _NewContainerSheetState extends State<NewContainerSheet> {
             ],
           ),
         ),
-        // const Gap(20),
-        // FilledButton(onPressed: , child: const Text("Create")),
       ],
     );
   }

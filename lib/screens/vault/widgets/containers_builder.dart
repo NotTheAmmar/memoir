@@ -105,6 +105,7 @@ class _ContainersBuilderState extends State<ContainersBuilder> {
             trailing: [
               if (_searchCtrl.text.isNotEmpty)
                 IconButton(
+                  tooltip: "Clear",
                   onPressed: _clearSearch,
                   icon: const FaIcon(FontAwesomeIcons.xmark),
                 )

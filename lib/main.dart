@@ -1,4 +1,6 @@
+import 'package:encrypt_shared_preferences/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:memoir/app/app.dart';
 import 'package:memoir/classes/database.dart';
 import 'package:memoir/classes/local_authenticator.dart';
@@ -8,7 +10,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 /// Entry Point of the Application
 ///
-/// Initializes [SQLite] Database before launching the app
+/// Performs initialization takes before launching the app
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -17,9 +19,14 @@ void main() {
   };
 
   Future.wait([
-    SQLite.instance.initDatabase(),
-    UserPreferences.instance.initializeStorage(),
-    LocalAuthenticator.instance.initialize()
+    dotenv.load().then((_) async {
+      return EncryptedSharedPreferences.initialize(
+        dotenv.env["SHARED_PREFERENCES_ENCRYPTION_KEY"]!,
+      );
+    }),
+    SQLite.initDatabase(),
+    UserPreferences.initializeStorage(),
+    LocalAuthenticator.initialize()
   ]).then((_) => runApp(const App()));
 }
 

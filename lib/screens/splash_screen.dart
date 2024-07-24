@@ -26,9 +26,8 @@ class _SplashScreenState extends State<SplashScreen> {
     Future.delayed(
       const Duration(seconds: 1, milliseconds: 500),
       () {
-        if (LocalAuthenticator.instance.canAuthenticate &&
-            UserPreferences.instance.appLock) {
-          authenticate();
+        if (LocalAuthenticator.canAuthenticate && UserPreferences.appLock) {
+          _authenticate();
         } else {
           _navigateToNextPage();
         }
@@ -41,8 +40,8 @@ class _SplashScreenState extends State<SplashScreen> {
   /// If the user does not authenticate or fails,
   /// and an BottomSheet is shown to give user another chance,
   /// and if still the user does not authenticate the applications exit
-  void authenticate() {
-    LocalAuthenticator.instance.authenticate().then((value) {
+  void _authenticate() {
+    LocalAuthenticator.authenticate().then((value) {
       if (value) {
         _navigateToNextPage();
       } else {
@@ -53,7 +52,7 @@ class _SplashScreenState extends State<SplashScreen> {
           context: context,
           builder: (_) {
             String content = "Unlock with ";
-            if (UserPreferences.instance.fingerprintOnly) {
+            if (UserPreferences.fingerprintOnly) {
               content += "Fingerprint";
             } else {
               content += "Pattern, PIN, Pattern, or Fingerprint";
@@ -66,9 +65,9 @@ class _SplashScreenState extends State<SplashScreen> {
               acceptText: "Unlock",
             );
           },
-        ).then((unlock) {
-          if (unlock ?? false) {
-            authenticate();
+        ).then((tryAgain) {
+          if (tryAgain ?? false) {
+            _authenticate();
           } else {
             FlutterExitApp.exitApp();
           }
@@ -79,7 +78,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   /// Navigate to [AuthenticationPage] if master password already exists otherwise to [SetupPage]
   void _navigateToNextPage() {
-    if (UserPreferences.instance.masterPassword.isEmpty) {
+    if (UserPreferences.masterPassword.isEmpty) {
       context.navigator.pushReplacementNamed(Routes.setup);
     } else {
       context.navigator.pushReplacementNamed(Routes.authentication);

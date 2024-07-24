@@ -27,8 +27,8 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
   /// Whether their is an error with master password
   bool _hasError = false;
 
-  /// Whether the master password is visible (obscured) or not
-  bool _visibility = true;
+  /// Whether the master password is visible or not
+  bool _visibility = false;
 
   @override
   void initState() {
@@ -63,7 +63,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
 
   /// Opens vault i.e. navigates to [HomePage] if the master password is valid
   void _openVault() {
-    if (_masterPassword.trim() == UserPreferences.instance.masterPassword) {
+    if (UserPreferences.masterPassword == _masterPassword.trim()) {
       setState(() => _hasError = false);
 
       context.navigator.pushReplacementNamed(Routes.vault);
@@ -107,16 +107,17 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                       ? Text(_error, style: context.textTheme.bodySmall)
                       : null,
                   suffixIcon: IconButton(
+                    tooltip: _visibility ? "Hide Password" : "Show Password",
                     onPressed: _changePasswordVisibility,
                     icon: FaIcon(
                       _visibility
-                          ? FontAwesomeIcons.solidEyeSlash
-                          : FontAwesomeIcons.solidEye,
+                          ? FontAwesomeIcons.solidEye
+                          : FontAwesomeIcons.solidEyeSlash,
                     ),
                   ),
                 ),
                 maxLines: 1,
-                obscureText: _visibility,
+                obscureText: !_visibility,
                 obscuringCharacter: '*',
                 onChanged: _onMasterPasswordChanged,
               ),

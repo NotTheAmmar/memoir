@@ -15,21 +15,17 @@ final ShapeBorder _border = RoundedRectangleBorder(
 );
 
 /// Base Color for Theme
-const Color _mainColor = Color(0xFFFFCE54);
+const Color _mainColor = Colors.amberAccent;
 
 /// Created using [_mainColor]
 final ColorScheme _lightScheme = ColorScheme.fromSeed(
   seedColor: _mainColor,
-  error: Colors.red,
-  onError: Colors.redAccent,
 );
 
 /// Created using [_mainColor] with [Brightness.dark]
 final ColorScheme _darkScheme = ColorScheme.fromSeed(
   brightness: Brightness.dark,
   seedColor: _mainColor,
-  error: Colors.red,
-  onError: Colors.redAccent,
 );
 
 /// Common Theme for Both [lightTheme] and [darkTheme]

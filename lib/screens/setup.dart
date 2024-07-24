@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:memoir/classes/assets.dart';
+import 'package:memoir/classes/encryptor.dart';
 import 'package:memoir/classes/routes.dart';
 import 'package:memoir/classes/user_preferences.dart';
 import 'package:memoir/extensions.dart';
@@ -16,6 +18,9 @@ class SetupPage extends StatefulWidget {
 }
 
 class _SetupPageState extends State<SetupPage> {
+  /// Whether the initialization is being done
+  bool _loading = false;
+
   /// Master Password to be set
   String _masterPassword = "";
 
@@ -70,15 +75,19 @@ class _SetupPageState extends State<SetupPage> {
 
   /// Sets the master password and navigates to [HomePage]
   void _createMasterPassword() {
-    UserPreferences.instance.masterPassword = _masterPassword.trim();
+    UserPreferences.masterPassword = _masterPassword.trim();
 
-    context.messenger.showSnackBar(const SnackBar(
-      duration: Duration(seconds: 2),
-      showCloseIcon: true,
-      content: Text("Master Password Created"),
-    ));
+    setState(() => _loading = true);
 
-    context.navigator.pushReplacementNamed(Routes.vault);
+    Encryptor.initializeKeys().then((_) {
+      context.messenger.showSnackBar(const SnackBar(
+        duration: Duration(seconds: 2),
+        showCloseIcon: true,
+        content: Text("Master Password Created"),
+      ));
+
+      context.navigator.pushReplacementNamed(Routes.vault);
+    });
   }
 
   @override
@@ -156,9 +165,20 @@ class _SetupPageState extends State<SetupPage> {
             ),
             const Gap(20),
             Center(
-              child: FilledButton(
+              child: FilledButton.icon(
                 onPressed: canCreate ? _createMasterPassword : null,
-                child: const Text("Create Master Password"),
+                icon: _loading
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: context.colorScheme.surface,
+                        ),
+                      )
+                    : const FaIcon(FontAwesomeIcons.key),
+                label: Text(
+                  _loading ? "Setting up..." : "Create Master Password",
+                ),
               ),
             )
           ],

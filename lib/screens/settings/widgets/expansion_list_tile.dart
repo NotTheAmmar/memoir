@@ -27,7 +27,7 @@ class ExpansionListTile extends StatefulWidget {
 class _ExpansionListTileState extends State<ExpansionListTile>
     with SingleTickerProviderStateMixin {
   /// Whether the tile is expanded or not
-  bool isExpanded = false;
+  bool _isExpanded = false;
 
   /// Animation Controller for expanding children of the tile
   late AnimationController _ctrl;
@@ -42,13 +42,10 @@ class _ExpansionListTileState extends State<ExpansionListTile>
     super.initState();
 
     _ctrl = AnimationController(
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 400),
       vsync: this,
     );
-    _animation = CurvedAnimation(
-      parent: _ctrl,
-      curve: Curves.easeIn,
-    );
+    _animation = CurvedAnimation(parent: _ctrl, curve: Curves.easeIn);
   }
 
   @override
@@ -60,9 +57,9 @@ class _ExpansionListTileState extends State<ExpansionListTile>
 
   /// Expands and Collapses the tile
   void _onExpansionChanged() {
-    setState(() => isExpanded = !isExpanded);
+    setState(() => _isExpanded = !_isExpanded);
 
-    if (isExpanded) {
+    if (_isExpanded) {
       _ctrl.forward();
     } else {
       _ctrl.reverse();
@@ -81,9 +78,10 @@ class _ExpansionListTileState extends State<ExpansionListTile>
           title: Text(widget.title),
           subtitle: Text(widget.subtitle),
           trailing: IconButton(
+            tooltip: _isExpanded ? "Collapse" : "Expand",
             onPressed: _onExpansionChanged,
             icon: FaIcon(
-              isExpanded
+              _isExpanded
                   ? FontAwesomeIcons.angleUp
                   : FontAwesomeIcons.angleDown,
             ),

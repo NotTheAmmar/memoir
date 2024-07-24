@@ -15,50 +15,38 @@ class PasswordGenerationSettings extends StatefulWidget {
 class _PasswordGenerationSettingsState
     extends State<PasswordGenerationSettings> {
   /// Updates [UserPreferences.useLetters]
-  ///
-  /// Causes Widget rebuild
   void _updateUseLetters(bool value) {
-    setState(() => UserPreferences.instance.useLetters = value);
+    setState(() => UserPreferences.useLetters = value);
   }
 
   /// Updates [UserPreferences.includeUppercase]
-  ///
-  /// Causes Widget rebuild
   void _updateIncludeUppercase(bool value) {
-    setState(() => UserPreferences.instance.includeUppercase = value);
+    setState(() => UserPreferences.includeUppercase = value);
   }
 
   /// Updates [UserPreferences.includeNumbers]
-  ///
-  /// Causes Widget rebuild
   void _updateIncludeNumbers(bool value) {
-    setState(() => UserPreferences.instance.includeNumbers = value);
+    setState(() => UserPreferences.includeNumbers = value);
   }
 
   /// Updates [UserPreferences.includeSpecialChars]
-  ///
-  /// Causes Widget rebuild
   void _updateIncludeSpecialChars(bool value) {
-    setState(() => UserPreferences.instance.includeSpecialChars = value);
+    setState(() => UserPreferences.includeSpecialChars = value);
   }
 
   /// Updates [UserPreferences.passwordLenRange]
-  ///
-  /// Causes Widget rebuild
   void _updatePasswordLenRange(RangeValues values) {
-    if (values.start > UserPreferences.instance.passwordLen ||
-        values.end < UserPreferences.instance.passwordLen) {
+    if (values.start > UserPreferences.passwordLen ||
+        values.end < UserPreferences.passwordLen) {
       return;
     }
 
-    setState(() => UserPreferences.instance.passwordLenRange = values);
+    setState(() => UserPreferences.passwordLenRange = values);
   }
 
   /// Updates [UserPreferences.passwordLen]
-  ///
-  /// Causes Widget rebuild
   void _updatePasswordLen(double value) {
-    setState(() => UserPreferences.instance.passwordLen = value);
+    setState(() => UserPreferences.passwordLen = value);
   }
 
   @override
@@ -68,13 +56,13 @@ class _PasswordGenerationSettingsState
       body: Column(
         children: [
           SwitchListTile(
-            value: UserPreferences.instance.useLetters,
+            value: UserPreferences.useLetters,
             onChanged: _updateUseLetters,
             title: const Text("Use Letters"),
             subtitle: const Text("Whether random password will use letters"),
           ),
           SwitchListTile(
-            value: UserPreferences.instance.includeUppercase,
+            value: UserPreferences.includeUppercase,
             onChanged: _updateIncludeUppercase,
             title: const Text("Include Uppercase Letters"),
             subtitle: const Text(
@@ -82,13 +70,13 @@ class _PasswordGenerationSettingsState
             ),
           ),
           SwitchListTile(
-            value: UserPreferences.instance.includeNumbers,
+            value: UserPreferences.includeNumbers,
             onChanged: _updateIncludeNumbers,
             title: const Text("Include Numbers"),
             subtitle: const Text("Whether random password will use numbers"),
           ),
           SwitchListTile(
-            value: UserPreferences.instance.includeSpecialChars,
+            value: UserPreferences.includeSpecialChars,
             onChanged: _updateIncludeSpecialChars,
             title: const Text("Include Special Characters"),
             subtitle: const Text(
@@ -100,21 +88,17 @@ class _PasswordGenerationSettingsState
             children: [
               Row(
                 children: [
-                  Text(
-                    "${UserPreferences.instance.passwordLenRange.start.toInt()}",
-                  ),
+                  Text("${UserPreferences.passwordLenRange.start.toInt()}"),
                   Expanded(
                     child: RangeSlider(
-                      values: UserPreferences.instance.passwordLenRange,
+                      values: UserPreferences.passwordLenRange,
                       onChanged: _updatePasswordLenRange,
                       min: 1,
                       max: 256,
                       divisions: 255,
                     ),
                   ),
-                  Text(
-                    "${UserPreferences.instance.passwordLenRange.end.toInt()}",
-                  ),
+                  Text("${UserPreferences.passwordLenRange.end.toInt()}"),
                 ],
               )
             ],
@@ -125,17 +109,15 @@ class _PasswordGenerationSettingsState
             children: [
               Row(
                 children: [
-                  Text("${UserPreferences.instance.passwordLen.toInt()}"),
+                  Text("${UserPreferences.passwordLen.toInt()}"),
                   Expanded(
                     child: Slider(
-                      value: UserPreferences.instance.passwordLen,
+                      value: UserPreferences.passwordLen,
                       onChanged: _updatePasswordLen,
-                      min: UserPreferences.instance.passwordLenRange.start,
-                      max: UserPreferences.instance.passwordLenRange.end,
-                      divisions: UserPreferences.instance.passwordLenRange.end
-                              .toInt() -
-                          UserPreferences.instance.passwordLenRange.start
-                              .toInt(),
+                      min: UserPreferences.passwordLenRange.start,
+                      max: UserPreferences.passwordLenRange.end,
+                      divisions: UserPreferences.passwordLenRange.end.toInt() -
+                          UserPreferences.passwordLenRange.start.toInt(),
                     ),
                   ),
                 ],

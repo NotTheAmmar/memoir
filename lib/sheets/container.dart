@@ -21,9 +21,11 @@ class ContainerSheet extends StatefulWidget {
 
 class _ContainerSheetState extends State<ContainerSheet> {
   /// Whether password is visible or not
-  bool _passVisibility = false;
+  bool _visibility = false;
 
   /// Pushes [EditContainerSheet] on a ModalBottomSheet
+  ///
+  /// takes context due to PopupMenuBuilder
   void showEditContainerSheet(BuildContext context) {
     // Here bool refers to whether the Container was updated
     showModalBottomSheet<bool>(
@@ -42,6 +44,8 @@ class _ContainerSheetState extends State<ContainerSheet> {
   }
 
   /// Pops up [ConfirmActionSheet] on the screen
+  ///
+  /// takes context due to PopupMenuBuilder
   void showConfirmDialog(BuildContext context) {
     // Here bool refers to whether to delete the container or not
     showModalBottomSheet<bool>(
@@ -57,7 +61,7 @@ class _ContainerSheetState extends State<ContainerSheet> {
       ),
     ).then((delete) {
       if (delete ?? false) {
-        SQLite.instance.removeContainer(widget.container.id);
+        SQLite.removeContainer(widget.container.id);
 
         // Popping false to avoid the SnackBar message
         context.navigator.pop(false);
@@ -72,31 +76,33 @@ class _ContainerSheetState extends State<ContainerSheet> {
         onTap: () => showEditContainerSheet(context),
         child: const Padding(
           padding: EdgeInsets.all(10),
-          child: Row(children: [
-            FaIcon(FontAwesomeIcons.penRuler),
-            Gap(20),
-            Text("Edit")
-          ]),
+          child: Row(
+            children: [
+              FaIcon(FontAwesomeIcons.penRuler),
+              Gap(20),
+              Text("Edit")
+            ],
+          ),
         ),
       ),
       PopupMenuItem(
         onTap: () => showConfirmDialog(context),
         child: const Padding(
           padding: EdgeInsets.all(10),
-          child: Row(children: [
-            FaIcon(FontAwesomeIcons.trashCan),
-            Gap(20),
-            Text("Delete")
-          ]),
+          child: Row(
+            children: [
+              FaIcon(FontAwesomeIcons.trashCan),
+              Gap(20),
+              Text("Delete")
+            ],
+          ),
         ),
       ),
     ];
   }
 
   /// Toggles the Password Visibility
-  void _toggleVisibility() {
-    setState(() => _passVisibility = !_passVisibility);
-  }
+  void _toggleVisibility() => setState(() => _visibility = !_visibility);
 
   @override
   Widget build(BuildContext context) {
@@ -119,17 +125,17 @@ class _ContainerSheetState extends State<ContainerSheet> {
             overflow: TextOverflow.ellipsis,
           ),
           subtitle: Text(
-            _passVisibility
+            _visibility
                 ? widget.container.password
                 : "*" * widget.container.password.length,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           trailing: IconButton(
-            tooltip: 'Toggle Visibility',
+            tooltip: _visibility ? "Hide Password" : "Show Password",
             onPressed: _toggleVisibility,
             icon: FaIcon(
-              _passVisibility
+              _visibility
                   ? FontAwesomeIcons.solidEye
                   : FontAwesomeIcons.solidEyeSlash,
             ),

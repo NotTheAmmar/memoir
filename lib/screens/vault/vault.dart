@@ -36,7 +36,7 @@ class _VaultPageState extends State<VaultPage> {
   void initState() {
     super.initState();
 
-    _containers = SQLite.instance.getContainers();
+    _containers = SQLite.getContainers();
   }
 
   /// Implements the Press Back again to quit functionality
@@ -67,7 +67,7 @@ class _VaultPageState extends State<VaultPage> {
   void _refreshContainers() {
     setState(() {
       // Do not use arrow Operator
-      _containers = SQLite.instance.getContainers();
+      _containers = SQLite.getContainers();
     });
   }
 

@@ -2,7 +2,7 @@ name: memoir
 description: "My Personal Password Manager"
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
-version: 1.1.1
+version: 2.0.0
 
 environment:
   sdk: ">=3.4.1 <4.0.0"
@@ -11,16 +11,24 @@ dependencies:
   flutter:
     sdk: flutter
 
-  android_path_provider:
+  android_path_provider: 
+  cryptography:
+  cryptography_flutter:
+  encrypt:
+  encrypt_shared_preferences:
+  flutter_dotenv:
   flutter_launcher_icons:
   file_picker:
-  flutter_exit_app: 
+  flutter_exit_app:
   font_awesome_flutter:
   gap:
-  local_auth: 
+  qr_flutter:
+  qr_code_scanner:
+  local_auth:
   path:
-  permission_handler: 
+  permission_handler:
   random_password_generator:
+  rsa_encrypt:
   shared_preferences:
   sqflite:
 
@@ -34,6 +42,7 @@ flutter:
   uses-material-design: true
 
   assets:
+    - ".env"
     - "assets/"
     - "assets/images/"
 
@@ -44,7 +53,7 @@ flutter:
         - asset: assets/fonts/RobotoMono-LightItalic.ttf
           style: italic
         - asset: assets/fonts/RobotoMono-Bold.ttf
-          weight: 500
+          weight: 400
 
 flutter_launcher_icons:
   android: "launcher_icon"

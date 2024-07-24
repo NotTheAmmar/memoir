@@ -20,7 +20,6 @@ class _SettingsState extends State<Settings> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          tooltip: "Back to Vault",
           // if didImport is true causes vault to refresh
           onPressed: () => context.navigator.pop(_didImport),
           icon: const Icon(Icons.arrow_back),
@@ -72,7 +71,7 @@ class _SettingsState extends State<Settings> {
                 Text(
                   'Ammar Rangwala',
                   style: context.textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
               ],
@@ -89,7 +88,7 @@ class _SettingsState extends State<Settings> {
                     fontStyle: FontStyle.italic,
                   ),
                 ),
-                const Text("1.1.1"),
+                const Text("2.0.0"),
               ],
             ),
           ),

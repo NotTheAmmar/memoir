@@ -7,25 +7,12 @@ import 'package:random_password_generator/random_password_generator.dart';
 enum PasswordStrength { strong, good, weak }
 
 /// Wrapper Class for [RandomPasswordGenerator]
-///
-/// It is a singleton class and methods are to be accessed using [instance]
-class PasswordGenerator {
-  /// Private Default Constructor
-  PasswordGenerator._();
-
-  /// Actual Instance
-  static final PasswordGenerator _instance = PasswordGenerator._();
-
-  /// Instance of the Class
-  ///
-  /// All the properties and methods are to be accessed through this
-  static PasswordGenerator get instance => _instance;
-
+abstract final class PasswordGenerator {
   /// [RandomPasswordGenerator] Object for generating random password
-  final RandomPasswordGenerator _generator = RandomPasswordGenerator();
+  static final RandomPasswordGenerator _generator = RandomPasswordGenerator();
 
   /// Returns the Password Strength
-  PasswordStrength _getStrength(String password) {
+  static PasswordStrength _getStrength(String password) {
     final double result = _generator.checkPassword(password: password);
 
     if (result >= 0.8) {
@@ -50,7 +37,7 @@ class PasswordGenerator {
   /// [passwordLen] specifies the length of the random password
   ///
   /// The random password will contain letters if the all bool option are `false`
-  String randomPassword({
+  static String randomPassword({
     required bool letters,
     required bool uppercase,
     required bool numbers,
@@ -69,13 +56,13 @@ class PasswordGenerator {
   /// Returns the password strength status
   ///
   /// Returns the string message and message color
-  /// 
+  ///
   /// `[Colors.greenAccent]` if it is `[PasswordStrength.strong]`
-  /// 
+  ///
   /// `[Colors.orangeAccent]` if it is `[PasswordStrength.good]`
-  /// 
+  ///
   /// `[Colors.redAccent]` if it is `[PasswordStrength.weak]`
-  (String, Color) getStatus(String password) {
+  static (String, Color) getStatus(String password) {
     if (password.isEmpty) return ('', Colors.grey);
 
     final PasswordStrength strength = _getStrength(password);

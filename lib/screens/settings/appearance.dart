@@ -10,7 +10,7 @@ class AppearanceSettings extends StatelessWidget {
   void _updateThemeMode(ThemeMode? value) {
     if (value == null) return;
 
-    UserPreferences.instance.themeMode = value;
+    UserPreferences.themeMode = value;
   }
 
   @override
@@ -25,7 +25,7 @@ class AppearanceSettings extends StatelessWidget {
           trailing: DropdownButton<ThemeMode>(
             enableFeedback: true,
             style: context.textTheme.bodySmall,
-            value: UserPreferences.instance.themeMode,
+            value: UserPreferences.themeMode,
             items: const [
               DropdownMenuItem(
                 value: ThemeMode.system,
