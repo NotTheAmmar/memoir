@@ -27,7 +27,7 @@ class PublicKeyScannerSheet extends StatelessWidget {
 
     if (!context.mounted) return;
     context.messenger.showSnackBar(const SnackBar(
-      duration: Duration(seconds: 1),
+      duration: Duration(milliseconds: 300),
       showCloseIcon: true,
       content: Text("Pasted"),
     ));

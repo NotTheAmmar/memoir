@@ -110,25 +110,67 @@ abstract final class Encryptor {
     return encrypter.decrypt64(encryptedData, iv: iv);
   }
 
-  /// Encrypts the file data using RSA encryption
+  /// Encrypts the file data using AES encryption,
+  /// but encrypts the AES Key using RSA Encryption
+  /// 
+  /// Cannot encrypt the data using RSA due to size limitations
+  /// 
+  /// The AES Key, IV, and Data are stored in json format,
+  /// then encoded in base64 format
+  /// 
+  /// Random AES Key and IV are used
   static String encryptFile(String data, String publicKey) {
-    Uint8List publicKeyBytes = base64Decode(publicKey);
+    final encrypt.Key aesKey = encrypt.Key.fromSecureRandom(32);
+    final encrypt.IV iv = encrypt.IV.fromSecureRandom(16);
 
-    return rsa.encrypt(
-      data,
+    final encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(
+      aesKey,
+      mode: encrypt.AESMode.cbc,
+    ));
+
+    final encrypt.Encrypted encrypted = encrypter.encrypt(data, iv: iv);
+
+    Uint8List publicKeyBytes = base64Decode(publicKey);
+    final String encryptedAesKey = rsa.encrypt(
+      aesKey.base64,
       _rsaHelper.parsePublicKeyFromPem(utf8.decode(publicKeyBytes)),
     );
+
+    final String encryptedData = jsonEncode({
+      "key": encryptedAesKey,
+      "iv": iv.base64,
+      "data": encrypted.base64,
+    });
+
+    final Uint8List encryptedBytes = utf8.encode(encryptedData);
+
+    return base64Encode(encryptedBytes);
   }
 
-  /// Decrypts the file data using RSA encryption
-  ///
-  /// Uses the device private key to decrypt
-  static String decryptFile(String encryptedData) {
-    Uint8List privateKeyBytes = base64Decode(UserPreferences.privateKey);
+  /// Decodes the base64 data back to json then
+  /// decrypts the encrypted AES Key using RSA  
+  /// (uses the device private key to decrypt),
+  /// then decrypts the encrypted data using AES
+  static String decryptFile(String data) {
+    final Uint8List encryptedDataBytes = base64Decode(data);
+    final String encryptedData = utf8.decode(encryptedDataBytes);
 
-    return rsa.decrypt(
-      encryptedData,
+    final Map jsonData = json.decode(encryptedData);
+
+    Uint8List privateKeyBytes = base64Decode(UserPreferences.privateKey);
+    final String aesKey64 = rsa.decrypt(
+      jsonData["key"],
       _rsaHelper.parsePrivateKeyFromPem(utf8.decode(privateKeyBytes)),
     );
+
+    final encrypt.Key aesKey = encrypt.Key.fromBase64(aesKey64);
+    final encrypt.IV iv = encrypt.IV.fromBase64(jsonData["iv"]);
+
+    final encrypt.Encrypter encrypter = encrypt.Encrypter(encrypt.AES(
+      aesKey,
+      mode: encrypt.AESMode.cbc,
+    ));
+
+    return encrypter.decrypt64(jsonData["data"], iv: iv);
   }
 }
