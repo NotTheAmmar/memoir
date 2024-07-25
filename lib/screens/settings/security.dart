@@ -102,9 +102,10 @@ class _SecuritySettingsState extends State<SecuritySettings> {
               Center(
                 child: QrImageView(
                   data: UserPreferences.publicKey,
-                  backgroundColor: context.colorScheme.onSurface,
-                  dataModuleStyle: QrDataModuleStyle(
-                    color: context.colorScheme.surface,
+                  backgroundColor:
+                      context.colorScheme.inverseSurface.withOpacity(0.75),
+                  dataModuleStyle: const QrDataModuleStyle(
+                    color: Colors.black,
                     dataModuleShape: QrDataModuleShape.square,
                   ),
                   gapless: false,

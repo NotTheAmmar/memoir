@@ -29,6 +29,7 @@ dependencies:
   permission_handler:
   random_password_generator:
   rsa_encrypt:
+  secure_app_switcher: 
   shared_preferences:
   sqflite:
 

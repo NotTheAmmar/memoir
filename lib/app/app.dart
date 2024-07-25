@@ -12,6 +12,7 @@ import 'package:memoir/screens/authentication.dart';
 import 'package:memoir/screens/settings/settings.dart';
 import 'package:memoir/screens/setup.dart';
 import 'package:memoir/screens/splash_screen.dart';
+import 'package:secure_app_switcher/secure_app_switcher.dart';
 
 /// Base [MaterialApp] Class
 ///
@@ -19,28 +20,52 @@ import 'package:memoir/screens/splash_screen.dart';
 class App extends StatelessWidget {
   const App({super.key});
 
+  Route? _generateSensitiveRoutes(RouteSettings settings) {
+    switch (settings.name) {
+      case Routes.vault:
+        return MaterialPageRoute(
+          builder: (_) => const SecureAppSwitcherPage(child: VaultPage()),
+          settings: settings,
+        );
+      case Routes.securitySettings:
+        return MaterialPageRoute(
+          builder: (_) {
+            return const SecureAppSwitcherPage(child: SecuritySettings());
+          },
+          settings: settings,
+        );
+      default:
+        return MaterialPageRoute(
+          builder: (_) => const SplashScreen(),
+          settings: settings,
+        );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: UserPreferences.themeNotifier,
       builder: (_, __) {
+        SecureAppSwitcher.on();
+
         return MaterialApp(
           title: 'Memoir',
           theme: lightTheme,
           darkTheme: darkTheme,
           themeMode: UserPreferences.themeMode,
+          navigatorObservers: [secureAppSwitcherRouteObserver],
           initialRoute: '/splashScreen',
+          onGenerateRoute: _generateSensitiveRoutes,
           routes: {
             Routes.splashScreen: (_) => const SplashScreen(),
             Routes.setup: (_) => const SetupPage(),
             Routes.authentication: (_) => const AuthenticationPage(),
-            Routes.vault: (_) => const VaultPage(),
             Routes.settings: (_) => const Settings(),
             Routes.appearanceSettings: (_) => const AppearanceSettings(),
             Routes.passwordGenerationSettings: (_) {
               return const PasswordGenerationSettings();
             },
-            Routes.securitySettings: (_) => const SecuritySettings(),
             Routes.backupRestoreSettings: (_) => const BackupRestoreSettings(),
             Routes.qrScanner: (_) => const QRScannerPage(),
           },
