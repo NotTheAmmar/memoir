@@ -102,15 +102,21 @@ class _SecuritySettingsState extends State<SecuritySettings> {
               Center(
                 child: QrImageView(
                   data: UserPreferences.publicKey,
-                  backgroundColor:
-                      context.colorScheme.inverseSurface.withOpacity(0.75),
-                  dataModuleStyle: const QrDataModuleStyle(
-                    color: Colors.black,
-                    dataModuleShape: QrDataModuleShape.square,
+                  backgroundColor: context.colorScheme.onSurface,
+                  dataModuleStyle: QrDataModuleStyle(
+                    color: context.colorScheme.surface,
+                    dataModuleShape: QrDataModuleShape.circle,
+                  ),
+                  eyeStyle: QrEyeStyle(
+                    color: context.colorScheme.surface,
+                    eyeShape: QrEyeShape.circle,
+                  ),
+                  embeddedImage: const AssetImage(Assets.logo),
+                  embeddedImageStyle: const QrEmbeddedImageStyle(
+                    size: Size.fromRadius(40),
                   ),
                   gapless: false,
                   size: context.mediaQuery.size.width * 0.8,
-                  embeddedImage: const AssetImage(Assets.logo),
                 ),
               ),
               const Gap(10),
