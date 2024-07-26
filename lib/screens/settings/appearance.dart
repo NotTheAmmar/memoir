@@ -3,14 +3,19 @@ import 'package:memoir/classes/user_preferences.dart';
 import 'package:memoir/extensions.dart';
 
 /// Appearance Settings
-class AppearanceSettings extends StatelessWidget {
+class AppearanceSettings extends StatefulWidget {
   const AppearanceSettings({super.key});
 
+  @override
+  State<AppearanceSettings> createState() => _AppearanceSettingsState();
+}
+
+class _AppearanceSettingsState extends State<AppearanceSettings> {
   /// Updates ThemeMode when value changes for [DropdownButton]
   void _updateThemeMode(ThemeMode? value) {
     if (value == null) return;
 
-    UserPreferences.themeMode = value;
+    setState(() => UserPreferences.themeMode = value);
   }
 
   @override

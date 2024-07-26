@@ -105,11 +105,18 @@ class _SecuritySettingsState extends State<SecuritySettings> {
                   backgroundColor: context.colorScheme.onSurface,
                   dataModuleStyle: QrDataModuleStyle(
                     color: context.colorScheme.surface,
-                    dataModuleShape: QrDataModuleShape.square,
+                    dataModuleShape: QrDataModuleShape.circle,
+                  ),
+                  eyeStyle: QrEyeStyle(
+                    color: context.colorScheme.surface,
+                    eyeShape: QrEyeShape.circle,
+                  ),
+                  embeddedImage: const AssetImage(Assets.logo),
+                  embeddedImageStyle: const QrEmbeddedImageStyle(
+                    size: Size.fromRadius(40),
                   ),
                   gapless: false,
                   size: context.mediaQuery.size.width * 0.8,
-                  embeddedImage: const AssetImage(Assets.logo),
                 ),
               ),
               const Gap(10),

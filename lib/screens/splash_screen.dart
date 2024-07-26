@@ -7,6 +7,10 @@ import 'package:memoir/classes/user_preferences.dart';
 import 'package:memoir/extensions.dart';
 import 'package:memoir/sheets/confirm_action.dart';
 
+// The Stupid Future.delayed is getting called twice,
+// thus the bloody the local_auth is throwing an error,
+// it does seem harmful but freaking fix it Future ME.
+
 /// SplashScreen Page
 ///
 /// Redirects to either [AuthenticationPage] or [SetupPage]
