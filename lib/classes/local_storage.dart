@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:encrypt_shared_preferences/provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Handles the storage of data
@@ -16,6 +17,10 @@ class LocalStorage {
   /// Initializes [SharedPreferences]
   Future<void> initialize() async {
     _preferences = await SharedPreferences.getInstance();
+    
+    await EncryptedSharedPreferences.initialize(
+      dotenv.env["SHARED_PREFERENCES_ENCRYPTION_KEY"]!,
+    );
     _securePreferences = EncryptedSharedPreferences.getInstance();
   }
 

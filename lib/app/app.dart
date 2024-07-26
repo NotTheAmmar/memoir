@@ -47,8 +47,6 @@ class App extends StatelessWidget {
     return AnimatedBuilder(
       animation: UserPreferences.themeNotifier,
       builder: (_, __) {
-        SecureAppSwitcher.on();
-
         return MaterialApp(
           title: 'Memoir',
           theme: lightTheme,
