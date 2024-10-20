@@ -47,4 +47,10 @@ abstract final class StorageKey {
 
   /// Password Keep Key
   static const String keepNewPassword = "keepNewPassword";
+
+  /// Is Developer Key
+  static const String isDeveloper = "isDeveloper";
+  
+  /// Prompt for Private key 
+  static const String promptPrivateKey = "promptPrivateKey";
 }

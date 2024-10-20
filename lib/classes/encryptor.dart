@@ -149,15 +149,15 @@ abstract final class Encryptor {
 
   /// Decodes the base64 data back to json then
   /// decrypts the encrypted AES Key using RSA  
-  /// (uses the device private key to decrypt),
+  /// (uses the device private key to decrypt, if no private key is provided),
   /// then decrypts the encrypted data using AES
-  static String decryptFile(String data) {
+  static String decryptFile(String data, String? privateKey) {
     final Uint8List encryptedDataBytes = base64Decode(data);
     final String encryptedData = utf8.decode(encryptedDataBytes);
 
     final Map jsonData = json.decode(encryptedData);
 
-    Uint8List privateKeyBytes = base64Decode(UserPreferences.privateKey);
+    Uint8List privateKeyBytes = base64Decode(privateKey ?? UserPreferences.privateKey);
     final String aesKey64 = rsa.decrypt(
       jsonData["key"],
       _rsaHelper.parsePrivateKeyFromPem(utf8.decode(privateKeyBytes)),
