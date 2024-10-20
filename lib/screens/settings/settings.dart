@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:memoir/classes/routes.dart';
+import 'package:memoir/classes/user_preferences.dart';
 import 'package:memoir/extensions.dart';
 
 /// Settings Page
@@ -14,6 +15,30 @@ class Settings extends StatefulWidget {
 class _SettingsState extends State<Settings> {
   /// Whether the user imported container or not
   bool _didImport = false;
+
+  /// Number of taps required to unlock [DeveloperSettings]
+  int _tapsToGo = 7;
+
+  /// Unlocks [DeveloperSettings] after `7` taps on version
+  void _onVersionTap() {
+    if (UserPreferences.isDeveloper) return;
+
+    _tapsToGo--;
+    if (_tapsToGo == 0) {
+      setState(() => UserPreferences.isDeveloper = true);
+      context.messenger.showSnackBar(const SnackBar(
+        content: Text("You are now a Developer!"),
+        duration: Duration(seconds: 2),
+        showCloseIcon: true,
+      ));
+    } else if (_tapsToGo < 4) {
+      context.messenger.showSnackBar(SnackBar(
+        content: Text("You are $_tapsToGo taps away from being a Developer"),
+        duration: const Duration(milliseconds: 200),
+        showCloseIcon: true,
+      ));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +81,14 @@ class _SettingsState extends State<Settings> {
             leading: const FaIcon(FontAwesomeIcons.boxArchive),
             title: const Text("Backup & Restore"),
           ),
+          if (UserPreferences.isDeveloper)
+            ListTile(
+              onTap: () => context.navigator.pushNamed(
+                Routes.developerSettings,
+              ),
+              leading: const FaIcon(FontAwesomeIcons.code),
+              title: const Text("Developer Options"),
+            ),
           const Divider(),
           Padding(
             padding: const EdgeInsets.all(10),
@@ -77,19 +110,22 @@ class _SettingsState extends State<Settings> {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Version",
-                  style: context.textTheme.bodyMedium?.copyWith(
-                    fontStyle: FontStyle.italic,
+          GestureDetector(
+            onTap: _onVersionTap,
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Version",
+                    style: context.textTheme.bodyMedium?.copyWith(
+                      fontStyle: FontStyle.italic,
+                    ),
                   ),
-                ),
-                const Text("2.0.0"),
-              ],
+                  const Text("2.1.0"),
+                ],
+              ),
             ),
           ),
         ],

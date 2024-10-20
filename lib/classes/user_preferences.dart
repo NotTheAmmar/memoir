@@ -204,4 +204,24 @@ abstract final class UserPreferences extends ChangeNotifier {
   static set keepNewPassword(bool value) {
     _storage.setBool(StorageKey.keepNewPassword, value);
   }
+
+  /// If Developer, unlocks the developer settings in the [Settings] page
+  /// 
+  /// Default: `false`
+  static bool get isDeveloper => _storage.getBool(StorageKey.isDeveloper);
+
+  static set isDeveloper(bool value) {
+    _storage.setBool(StorageKey.isDeveloper, value);
+  }
+
+  /// Whether to ask for a different private key
+  /// or use the device private key,
+  /// when restoring containers from file
+  /// 
+  /// Default: `false` 
+  static bool get promptPrivateKey => _storage.getBool(StorageKey.promptPrivateKey);
+
+  static set promptPrivateKey(bool value) {
+    _storage.setBool(StorageKey.promptPrivateKey, value);
+  }
 }

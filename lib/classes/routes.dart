@@ -28,6 +28,9 @@ abstract final class Routes {
   /// [BackupRestoreSettings] Route
   static const String backupRestoreSettings = "/settings/backupRestore";
 
+  /// [DeveloperSettings] Route
+  static const String developerSettings = "/settings/developerSettings";
+
   /// [QRScannerPage] Route
   static const String qrScanner = "/qrScanner";
 }

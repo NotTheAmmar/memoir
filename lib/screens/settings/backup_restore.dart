@@ -13,6 +13,7 @@ import 'package:memoir/extensions.dart';
 import 'package:memoir/main.dart';
 import 'package:memoir/screens/settings/widgets/expansion_list_tile.dart';
 import 'package:memoir/sheets/confirm_action.dart';
+import 'package:memoir/sheets/private_key.dart';
 import 'package:memoir/sheets/public_key_scanner.dart';
 
 /// Backup & Restore Settings
@@ -128,7 +129,7 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
     return UserPreferences.keepNewPassword;
   }
 
-  /// Reads the file then decrypts the file with device private key
+  /// Reads the file then decrypts the file with private key
   /// then decodes the json data and
   /// starts to insert it in the database
   ///
@@ -139,13 +140,13 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
   /// The user is asked for every duplicate container
   ///
   /// After successful import, a [SnackBar] message is shown
-  Future<void> _importContainers(String path) async {
+  Future<void> _importContainers(String path, {String? privateKey}) async {
     try {
       final File importFile = File(path);
 
       final List<int> rawBytes = importFile.readAsBytesSync();
       final String encryptedData = utf8.decode(rawBytes);
-      final String jsonData = Encryptor.decryptFile(encryptedData);
+      final String jsonData = Encryptor.decryptFile(encryptedData, privateKey);
       // Do not annotate the list, cannot be typecasted
       List data = jsonDecode(jsonData);
 
@@ -193,6 +194,7 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
 
   /// Checks for storage permissions, if granted then
   /// prompts the user to select the binary file, after selected
+  /// asks for private key if prompt enabled, then
   /// imports all the containers
   void _onRestoreTapped() {
     checkPermissions().then((granted) {
@@ -209,7 +211,7 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
       AndroidPathProvider.documentsPath.then((directory) {
         final Future<FilePickerResult?> result = FilePicker.platform.pickFiles(
           allowMultiple: false,
-          dialogTitle: "Pick Json File",
+          dialogTitle: "Pick Backup File",
           allowedExtensions: ['bin'],
           initialDirectory: directory,
           type: FileType.custom,
@@ -218,7 +220,21 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
         result.then((file) {
           if (file == null) return;
 
-          _importContainers(file.paths.first!);
+          if (UserPreferences.promptPrivateKey) {
+            final Future<String?> result = showModalBottomSheet<String>(
+              elevation: 10,
+              enableDrag: false,
+              isDismissible: false,
+              context: context,
+              builder: (_) => const PrivateKeySheet(),
+            );
+
+            result.then((value) {
+              _importContainers(file.paths.first!, privateKey: value);
+            });
+          } else {
+            _importContainers(file.paths.first!);
+          }
         });
       });
     });

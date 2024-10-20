@@ -34,14 +34,20 @@ void main() {
 ///
 /// Returns `false` if permission is not granted or missing
 Future<bool> checkPermissions() async {
-  if (!await Permission.storage.isGranted) {
-    if (!(await Permission.storage.request()).isGranted) return false;
+  final bool storage = await Permission.storage.isGranted;
+
+  if (!storage) {
+    final PermissionStatus status = await Permission.storage.request();
+
+    if (!status.isGranted) return false;
   }
 
-  if (!await Permission.manageExternalStorage.isGranted) {
-    if (!(await Permission.manageExternalStorage.request()).isGranted) {
-      return false;
-    }
+  final bool externalStorage = await Permission.manageExternalStorage.isGranted;
+  if (!externalStorage) {
+    final PermissionStatus status =
+        await Permission.manageExternalStorage.request();
+
+    if (!status.isGranted) return false;
   }
 
   return true;
